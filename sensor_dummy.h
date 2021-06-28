@@ -15,10 +15,10 @@
 #define ALT_SATURATION_MAX_BLANCO 11
 #define ALT_SATURATION_MAX_NEGRO 20
 #define ALT_SATURATION_MAX_GRIS 15
-
+/*
 #define ALT_H_CONVERTER 360.0
 #define ALT_LS_CONVERTER 100.0
-
+*/
 enum ColorCategory ReadColorDummy();
 void InitSensor();
 enum ColorCategory ReadColor();
