@@ -3,6 +3,7 @@
 
 enum class RotationDirection {Clockwise, CounterClockwise};
 enum class ButtonAction {Press, Hold, Release, Rest};
+enum class TextAlignment {Left, Right, Center};
 enum class ColorCategory {
     Reds, Yellows, Blues,
     Greens, Whites, Greys,
@@ -29,6 +30,8 @@ private:
     int cyclesHeld;
 };
 
-void I2CScanner();
+int I2CScanner(byte addrs[]);
+char* ConvertColorCategoryToChar(ColorCategory category);
+char* RepeatChar(char p_char, int p_repetitions);
 
 #endif //CLASIFICADORA_COMMON_STUFF_H

@@ -68,6 +68,11 @@ void StepperControl::processState() {
                 if (actionChange) {
                     Serial.println("Stopping stepper motor.");
                     actionChange = false;
+                    digitalWrite(pinIN1, LOW);
+                    digitalWrite(pinIN2, LOW);
+                    digitalWrite(pinIN3, LOW);
+                    digitalWrite(pinIN4, LOW);
+                    currentAction = StepperActions::Resting;
                 }
                 break;
         }

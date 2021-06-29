@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Wire.h>
 
 #include "common_stuff.h"
 
@@ -43,8 +44,8 @@ int ButtonState::getState() {return state;}
 int ButtonState::getCyclesHeld() {return cyclesHeld;}
 ButtonAction ButtonState::getUserAction() {return userAction;}
 
-void I2CScanner(int p_pin_sda, int p_pin_scl, byte addrs[]) {
-    Wire.begin(14, 12);
+int I2CScanner(byte addrs[]) {
+    Wire.begin();
 
     byte errCode, addr;
     int devCount;
@@ -84,4 +85,34 @@ void I2CScanner(int p_pin_sda, int p_pin_scl, byte addrs[]) {
     }
 
     Wire.end();
+    return devCount;
+}
+
+char* ConvertColorCategoryToChar(ColorCategory p_category) {
+    switch (p_category) {
+        case ColorCategory::Reds:
+            return "Reds";
+        case ColorCategory::Yellows:
+            return "Yellows";
+        case ColorCategory::Blues:
+            return "Blues";
+        case ColorCategory::Greens:
+            return "Greens";
+        case ColorCategory::Whites:
+            return "Whites";
+        case ColorCategory::Greys:
+            return "Greys";
+        default: //Blacks
+            return "Blacks";
+    }
+}
+
+char* RepeatChar(char p_char, int p_repetitions) {
+    char* resutlingString;
+
+    for (int i = 0; i < p_repetitions; i++) {
+        resutlingString += p_char;
+    }
+
+    return resutlingString;
 }
