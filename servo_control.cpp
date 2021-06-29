@@ -15,6 +15,7 @@ void ServoControl::attach(int p_pin_servo_signal) {
 
         servo_obj.attach(pinSignal, 500, 2500);
         servo_obj.write(rotation_black);
+        initialized = true;
     } else {
         Serial.println("Servo motor already attached.");
     }

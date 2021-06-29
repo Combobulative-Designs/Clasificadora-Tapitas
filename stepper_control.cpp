@@ -21,12 +21,15 @@ void StepperControl::attach(int p_pinIN1, int p_pinIN2, int p_pinIN3, int p_pinI
         pinMode(pinIN2, OUTPUT);
         pinMode(pinIN3, OUTPUT);
         pinMode(pinIN4, OUTPUT);
+        initialized = true;
     } else {
         Serial.println("Stepper motor already attached.");
     }
 }
 
 void StepperControl::processState() {
+    rotateStep(RotationDirection::Clockwise);
+    /*
     if (initialized) {
         int nextPosition;
 
@@ -79,6 +82,7 @@ void StepperControl::processState() {
     } else {
         Serial.println("Stepper motor not attached.");
     }
+    */
 }
 
 void StepperControl::doCycling() {
@@ -119,7 +123,7 @@ void StepperControl::rotateStep(enum RotationDirection direction) {
             stepCounter++;
             if (stepCounter >= stepsTotal) stepCounter = 0;
             writeToStepper(stepCounter);
-        case RotationDirection::CounterClockwise:
+        default:
             stepCounter--;
             if (stepCounter < 0) stepCounter = stepsTotal - 1;
             writeToStepper(stepCounter);
@@ -127,9 +131,12 @@ void StepperControl::rotateStep(enum RotationDirection direction) {
 }
 
 void StepperControl::writeToStepper(int p_step) {
-    int step = stepsLookup[p_step];
-    digitalWrite(pinIN1, bitRead(step, 0));
-    digitalWrite(pinIN2, bitRead(step, 1));
-    digitalWrite(pinIN3, bitRead(step, 2));
-    digitalWrite(pinIN4, bitRead(step, 3));
+    /*digitalWrite(pinIN1, bitRead(stepsLookup[p_step], 0));
+    digitalWrite(pinIN2, bitRead(stepsLookup[p_step], 1));
+    digitalWrite(pinIN3, bitRead(stepsLookup[p_step], 2));
+    digitalWrite(pinIN4, bitRead(stepsLookup[p_step], 3));*/
+    digitalWrite(pinIN1, LOW);
+    digitalWrite(pinIN2, LOW);
+    digitalWrite(pinIN3, HIGH);
+    digitalWrite(pinIN4, HIGH);
 }

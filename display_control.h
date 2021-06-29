@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 #include "common_stuff.h"
 
 #ifndef CLASIFICADORA_TI3_DISPLAY_CONTROL_H

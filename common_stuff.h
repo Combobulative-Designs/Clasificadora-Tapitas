@@ -30,7 +30,7 @@ private:
     int cyclesHeld;
 };
 
-int I2CScanner(byte addrs[]);
+void I2CScanner();
 char* ConvertColorCategoryToChar(ColorCategory category);
 char* RepeatChar(char p_char, int p_repetitions);
 

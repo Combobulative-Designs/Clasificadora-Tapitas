@@ -44,7 +44,7 @@ int ButtonState::getState() {return state;}
 int ButtonState::getCyclesHeld() {return cyclesHeld;}
 ButtonAction ButtonState::getUserAction() {return userAction;}
 
-int I2CScanner(byte addrs[]) {
+void I2CScanner() {
     Wire.begin();
 
     byte errCode, addr;
@@ -65,7 +65,6 @@ int I2CScanner(byte addrs[]) {
             Serial.print(addr,HEX);
             Serial.println(".");
 
-            addrs[devCount] = addr;
             devCount++;
 
         } else if (errCode == 4) {
@@ -85,25 +84,24 @@ int I2CScanner(byte addrs[]) {
     }
 
     Wire.end();
-    return devCount;
 }
 
 char* ConvertColorCategoryToChar(ColorCategory p_category) {
     switch (p_category) {
         case ColorCategory::Reds:
-            return "Reds";
+            return (char*)"Reds";
         case ColorCategory::Yellows:
-            return "Yellows";
+            return (char*)"Yellows";
         case ColorCategory::Blues:
-            return "Blues";
+            return (char*)"Blues";
         case ColorCategory::Greens:
-            return "Greens";
+            return (char*)"Greens";
         case ColorCategory::Whites:
-            return "Whites";
+            return (char*)"Whites";
         case ColorCategory::Greys:
-            return "Greys";
+            return (char*)"Greys";
         default: //Blacks
-            return "Blacks";
+            return (char*)"Blacks";
     }
 }
 

@@ -7,10 +7,10 @@
 #include "stepper_control.h"
 #include "encoder_control.h"
 
-#define PIN_SERVO_BUTTON 2
-#define PIN_PANIC_BUTTON 3
-#define PIN_STEPPER_BUTTON 4
-#define PIN_SENSOR_BUTTON 5
+#define PIN_STEPPER_BUTTON 2
+#define PIN_SERVO_BUTTON 3
+#define PIN_SENSOR_BUTTON 4
+#define PIN_PANIC_BUTTON 5
 
 #define PIN_ENCODER_CLK 6
 #define PIN_ENCODER_DT 7
@@ -41,24 +41,27 @@ void setup() {
     sensorButton.attach(PIN_SENSOR_BUTTON);
     servoButton.attach(PIN_SERVO_BUTTON);
     stepperButton.attach(PIN_STEPPER_BUTTON);
-    panicButton.attach(PIN_PANIC_BUTTON);
+    //panicButton.attach(PIN_PANIC_BUTTON);
 
-    InitSensor();
-    encoderControl.attach(PIN_ENCODER_CLK,
-                          PIN_ENCODER_DT);
-    stepperControl.attach(PIN_STEPPER_IN1,
+    //InitSensor();
+    /*encoderControl.attach(PIN_ENCODER_CLK,
+                          PIN_ENCODER_DT);*/
+    /*stepperControl.attach(PIN_STEPPER_IN1,
                    PIN_STEPPER_IN2,
                    PIN_STEPPER_IN3,
-                   PIN_STEPPER_IN4);
+                   PIN_STEPPER_IN4);*/
     servoControl.attach(PIN_SERVO_SIGNAL);
 }
 
 void loop() {
     ProcessServoButton();
-    ProcessStepperButton();
+    //ProcessStepperButton();
     ProcessSensorButton();
-    ProcessPanicButton();
+    /*ProcessPanicButton();*/
 
+    //I2CScanner();
+
+    //Serial.println("PANIK!!!");
     delay(CYCLE_DURATION);
 }
 
@@ -67,6 +70,7 @@ void ProcessServoButton() {
     servoButton.processState();
 
     if (servoButton.getUserAction() == ButtonAction::Release) {
+        Serial.println("Moving servo..");
         servoControl.moveToColor(categoryDetected);
     }
 }
@@ -74,17 +78,25 @@ void ProcessServoButton() {
 void ProcessStepperButton() {
     stepperButton.processState();
 
+    if (stepperButton.getUserAction() == ButtonAction::Release) {
+      stepperControl.doCapStep();
+    }
+    
+/*
     if (stepperButton.getUserAction() == ButtonAction::Hold) {
         if (stepperButton.getCyclesHeld() >= 150 and stepperControl.getCurrentAction() == StepperActions::Resting) {
             stepperControl.doCycling();
+            Serial.println("Cycling.");
             encoderControl.resetRotation();
         }
     } else if (stepperButton.getUserAction() == ButtonAction::Release) {
         if (stepperControl.getCurrentAction() == StepperActions::Resting) {
             stepperControl.doCapStep();
+            Serial.println("Cap Step.");
             encoderControl.resetRotation();
         } else if (stepperControl.getCurrentAction() == StepperActions::Cycling) {
             stepperControl.stopActions();
+            Serial.println("Stopping.");
         }
     }
 
@@ -93,7 +105,7 @@ void ProcessStepperButton() {
         sprintf(angleStr, "%s%d%s", "Stepper moved ", encoderControl.getAngle(), " degrees.");
         Serial.println(angleStr);
     }
-
+*/
     stepperControl.processState();
 }
 
@@ -101,6 +113,7 @@ void ProcessSensorButton() {
     sensorButton.processState();
 
     if (sensorButton.getUserAction() == ButtonAction::Release) {
+        Serial.println("Reading color.");
         categoryDetected = ReadColorDummy();
         //categoryDetected = ReadColor();
     }
