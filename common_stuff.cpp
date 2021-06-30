@@ -3,7 +3,7 @@
 
 #include "common_stuff.h"
 
-ButtonState::ButtonState() : pinButton(0), state(0), cyclesHeld(0), initialized(false) {}
+ButtonState::ButtonState() : pinButton(0), state(0), newState(0), secondsHeld(0), initialized(false), previousMillis(0) {}
 
 void ButtonState::attach(int p_pin_button) {
     if (!initialized) {
@@ -20,18 +20,28 @@ void ButtonState::attach(int p_pin_button) {
 
 void ButtonState::processState() {
     if (initialized) {
-        int newState = digitalRead(pinButton);
+        newState = digitalRead(pinButton);
 
         if (newState == HIGH && state == LOW) {
             userAction = ButtonAction::Press;
+            previousMillis = 0;
+            secondsHeld = 0;
+            Serial.println("Button pressed.");
         } else if (newState == HIGH && state == HIGH) {
             userAction = ButtonAction::Hold;
-            cyclesHeld += 1;
+            //Serial.println("Button on hold.");
+            if (millis() >= previousMillis + 1000) {
+                previousMillis = millis();
+                secondsHeld += 1  ;
+            }
         } else if (newState == LOW && state == HIGH) {
             userAction = ButtonAction::Release;
-            cyclesHeld = 0;
+            Serial.println("Button released.");
+            previousMillis = 0;
         } else if (newState == LOW && state == LOW) {
             userAction = ButtonAction::Rest;
+            secondsHeld = 0;
+            //Serial.println("Button resting.");
         }
 
         state = newState;
@@ -41,7 +51,7 @@ void ButtonState::processState() {
 }
 
 int ButtonState::getState() {return state;}
-int ButtonState::getCyclesHeld() {return cyclesHeld;}
+int ButtonState::getSecondsHeld() {return secondsHeld;}
 ButtonAction ButtonState::getUserAction() {return userAction;}
 
 void I2CScanner() {

@@ -7,9 +7,9 @@
 
 class ServoControl {
 public:
-    ServoControl();
+    ServoControl(int p_pin_servo_signal);
 
-    void attach(int p_pin_servo_signal);
+    void initialize();
     void moveToColor(ColorCategory p_category);
 
 private:

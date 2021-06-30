@@ -5,19 +5,17 @@
 
 #include "servo_control.h"
 
-ServoControl::ServoControl() : rotation_black(0), pinSignal(0), initialized(false) {}
+ServoControl::ServoControl(int p_pin_servo_signal) : rotation_black(0), initialized(false), pinSignal(p_pin_servo_signal) {}
 
-void ServoControl::attach(int p_pin_servo_signal) {
+void ServoControl::initialize() {
     if (!initialized) {
-        Serial.println("Attaching servo motor.");
-
-        pinSignal = p_pin_servo_signal;
-
+        Serial.println("Initializing servo motor.");
+        
         servo_obj.attach(pinSignal, 500, 2500);
         servo_obj.write(rotation_black);
         initialized = true;
     } else {
-        Serial.println("Servo motor already attached.");
+        Serial.println("Servo motor already initialized.");
     }
 }
 
@@ -49,6 +47,6 @@ void ServoControl::moveToColor(ColorCategory p_category) {
         }
         servo_obj.write(rotation);
     } else {
-        Serial.println("Servo motor not attached.");
+        Serial.println("Servo motor not initialized.");
     }
 }

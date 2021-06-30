@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <LiquidCrystal_I2C.h>
 
 #include "common_stuff.h"
 
@@ -21,9 +22,9 @@ public:
     TextAlignment alignment;
 };
 
-class Display {
+class DisplayControl {
 public:
-    Display(byte address, int columns, int rows);
+    DisplayControl(byte address, int columns, int rows);
     void initialize();
     void processState();
 

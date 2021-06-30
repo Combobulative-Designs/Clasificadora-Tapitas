@@ -1,38 +1,33 @@
+#include <AccelStepper.h>
+#include <MultiStepper.h>
+
 #include <Arduino.h>
 
 #include "common_stuff.h"
 
 #include "stepper_control.h"
 
-StepperControl::StepperControl() : initialized(false), stepCounter(0), positionCounter(0), actionChange(false), currentAction(StepperActions::Resting) {}
+StepperControl::StepperControl(int p_pinIN1, int p_pinIN2, int p_pinIN3, int p_pinIN4) : initialized(false), positionCounter(0), nextPosition(0), actionChange(false), currentAction(StepperActions::Resting), previousAction(StepperActions::Resting), stepper(8, p_pinIN1, p_pinIN3, p_pinIN2, p_pinIN4) {}
 
 StepperActions StepperControl::getCurrentAction() {return currentAction;}
 
-void StepperControl::attach(int p_pinIN1, int p_pinIN2, int p_pinIN3, int p_pinIN4) {
+void StepperControl::initialize() {
     if (!initialized) {
-        Serial.println("Attaching stepper motor.");
+        Serial.println("Initializing stepper motor.");
 
-        pinIN1 = p_pinIN1;
-        pinIN2 = p_pinIN2;
-        pinIN3 = p_pinIN3;
-        pinIN4 = p_pinIN4;
+        stepper.setCurrentPosition(0);
+        stepper.setMaxSpeed(speed);
 
-        pinMode(pinIN1, OUTPUT);
-        pinMode(pinIN2, OUTPUT);
-        pinMode(pinIN3, OUTPUT);
-        pinMode(pinIN4, OUTPUT);
         initialized = true;
     } else {
-        Serial.println("Stepper motor already attached.");
+        Serial.println("Stepper motor already initialized.");
     }
 }
 
 void StepperControl::processState() {
-    rotateStep(RotationDirection::Clockwise);
-    /*
     if (initialized) {
-        int nextPosition;
-
+        if (stepper.currentPosition() >= 4096) stepper.setCurrentPosition(stepper.currentPosition() - 4096);
+      
         switch (currentAction) {
             case StepperActions::Resting:
                 if (actionChange) {
@@ -43,46 +38,60 @@ void StepperControl::processState() {
                 if (actionChange) {
                     Serial.println("Moving stepper motor one cap step.");
                     actionChange = false;
+                    nextPosition = positionCounter + 1;
+                    if (nextPosition >= positions) { nextPosition = 0; }
+                    stepper.enableOutputs();
+                    stepper.setSpeed(speed);
+                    stepper.moveTo(positionSteps[nextPosition]);
                 }
-                nextPosition = positionCounter + 1;
-                if (nextPosition >= 12) { positionCounter = 0; }
-                if (stepCounter != positionsSteps[positionCounter + 1]) {
-                    rotateStep(RotationDirection::Clockwise);
-                } else {
-                    actionChange = true;
+                if (stepper.currentPosition() == stepper.targetPosition()) {
                     positionCounter = nextPosition;
+                    actionChange = true;
                     currentAction = StepperActions::Stopping;
+                } else {
+                    stepper.setSpeed(speed);
+                    stepper.runSpeed();
                 }
                 break;
             case StepperActions::Cycling:
                 if (actionChange) {
                     Serial.println("Cycling stepper motor.");
                     actionChange = false;
+                    nextPosition = positionCounter + 1;
+                    if (nextPosition >= positions) { nextPosition = 0; }
+                    stepper.enableOutputs();
+                    stepper.setSpeed(speed);
+                    stepper.moveTo(positionSteps[nextPosition]);
                 }
-                nextPosition = positionCounter + 1;
-                if (nextPosition >= 12) { positionCounter = 0; }
-                if (stepCounter != positionsSteps[positionCounter + 1]) {
-                    rotateStep(RotationDirection::Clockwise);
-                } else {
+                if (stepper.currentPosition() == stepper.targetPosition()) {
                     positionCounter = nextPosition;
+                    nextPosition = positionCounter + 1;
+                    if (nextPosition >= positions) { nextPosition = 0; }
+                    stepper.moveTo(positionSteps[nextPosition]);
+                    stepper.setSpeed(speed);
+                    stepper.runSpeed();
+                } else {
+                    stepper.setSpeed(speed);
+                    stepper.runSpeed();
                 }
                 break;
             case StepperActions::Stopping:
                 if (actionChange) {
                     Serial.println("Stopping stepper motor.");
                     actionChange = false;
-                    digitalWrite(pinIN1, LOW);
-                    digitalWrite(pinIN2, LOW);
-                    digitalWrite(pinIN3, LOW);
-                    digitalWrite(pinIN4, LOW);
+                    stepper.disableOutputs();
+                    if (previousAction == StepperActions::Cycling) {
+                        stepper.setCurrentPosition(0);
+                        positionCounter = 0;
+                    }
+                    actionChange = true;
                     currentAction = StepperActions::Resting;
                 }
                 break;
         }
-    } else {
-        Serial.println("Stepper motor not attached.");
+
+        previousAction = currentAction;
     }
-    */
 }
 
 void StepperControl::doCycling() {
@@ -92,7 +101,7 @@ void StepperControl::doCycling() {
             currentAction = StepperActions::Cycling;
         }
     } else {
-        Serial.println("Stepper motor not attached.");
+        Serial.println("Stepper motor not initialized.");
     }
 }
 
@@ -103,7 +112,7 @@ void StepperControl::doCapStep() {
             currentAction = StepperActions::CapStep;
         }
     } else {
-        Serial.println("Stepper motor not attached.");
+        Serial.println("Stepper motor not initialized.");
     }
 }
 void StepperControl::stopActions() {
@@ -113,30 +122,6 @@ void StepperControl::stopActions() {
             currentAction = StepperActions::Stopping;
         }
     } else {
-        Serial.println("Stepper motor not attached.");
+        Serial.println("Stepper motor not initialized.");
     }
-}
-
-void StepperControl::rotateStep(enum RotationDirection direction) {
-    switch (direction) {
-        case RotationDirection::Clockwise:
-            stepCounter++;
-            if (stepCounter >= stepsTotal) stepCounter = 0;
-            writeToStepper(stepCounter);
-        default:
-            stepCounter--;
-            if (stepCounter < 0) stepCounter = stepsTotal - 1;
-            writeToStepper(stepCounter);
-    }
-}
-
-void StepperControl::writeToStepper(int p_step) {
-    /*digitalWrite(pinIN1, bitRead(stepsLookup[p_step], 0));
-    digitalWrite(pinIN2, bitRead(stepsLookup[p_step], 1));
-    digitalWrite(pinIN3, bitRead(stepsLookup[p_step], 2));
-    digitalWrite(pinIN4, bitRead(stepsLookup[p_step], 3));*/
-    digitalWrite(pinIN1, LOW);
-    digitalWrite(pinIN2, LOW);
-    digitalWrite(pinIN3, HIGH);
-    digitalWrite(pinIN4, HIGH);
 }

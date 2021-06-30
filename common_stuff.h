@@ -17,7 +17,7 @@ public:
     void attach(int p_pin_button);
     int getState();
     ButtonAction getUserAction();
-    int getCyclesHeld();
+    int getSecondsHeld();
 
     void processState();
 
@@ -26,8 +26,11 @@ private:
 
     bool initialized;
     int state;
+    int newState;
     enum ButtonAction userAction;
-    int cyclesHeld;
+    int secondsHeld;
+
+    unsigned long previousMillis; 
 };
 
 void I2CScanner();

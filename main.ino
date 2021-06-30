@@ -1,4 +1,6 @@
 #include <Servo.h>
+#include <AccelStepper.h>
+#include <LiquidCrystal_I2C.h>
 
 #include "common_stuff.h"
 
@@ -6,6 +8,7 @@
 #include "servo_control.h"
 #include "stepper_control.h"
 #include "encoder_control.h"
+#include "display_control.h"
 
 #define PIN_STEPPER_BUTTON 2
 #define PIN_SERVO_BUTTON 3
@@ -22,6 +25,8 @@
 
 #define PIN_SERVO_SIGNAL 12
 
+#define PIN_SENSOR_LED 13
+
 #define CYCLE_DURATION 20
 
 enum ColorCategory categoryDetected = ColorCategory::Blacks;
@@ -32,8 +37,10 @@ ButtonState stepperButton;
 ButtonState panicButton;
 
 RotaryEncoderControl encoderControl;
-StepperControl stepperControl;
-ServoControl servoControl;
+StepperControl stepperControl(PIN_STEPPER_IN1, PIN_STEPPER_IN2, PIN_STEPPER_IN3, PIN_STEPPER_IN4);
+ServoControl servoControl(PIN_SERVO_SIGNAL);
+DisplayControl displayControl(0x27, 16, 2);
+
 
 void setup() {
     Serial.begin(9600);
@@ -41,28 +48,25 @@ void setup() {
     sensorButton.attach(PIN_SENSOR_BUTTON);
     servoButton.attach(PIN_SERVO_BUTTON);
     stepperButton.attach(PIN_STEPPER_BUTTON);
-    //panicButton.attach(PIN_PANIC_BUTTON);
+    panicButton.attach(PIN_PANIC_BUTTON);
 
-    //InitSensor();
+    InitSensor();
+    displayControl.initialize();
+    stepperControl.initialize();
+    servoControl.initialize();
     /*encoderControl.attach(PIN_ENCODER_CLK,
                           PIN_ENCODER_DT);*/
-    /*stepperControl.attach(PIN_STEPPER_IN1,
-                   PIN_STEPPER_IN2,
-                   PIN_STEPPER_IN3,
-                   PIN_STEPPER_IN4);*/
-    servoControl.attach(PIN_SERVO_SIGNAL);
+    
+    pinMode(PIN_SENSOR_LED, OUTPUT);
+    digitalWrite(PIN_SENSOR_LED, HIGH);
 }
 
 void loop() {
     ProcessServoButton();
-    //ProcessStepperButton();
+    ProcessStepperButton();
     ProcessSensorButton();
-    /*ProcessPanicButton();*/
-
-    //I2CScanner();
-
-    //Serial.println("PANIK!!!");
-    delay(CYCLE_DURATION);
+    ProcessPanicButton();
+    ProcessDisplayState();
 }
 
 
@@ -70,7 +74,6 @@ void ProcessServoButton() {
     servoButton.processState();
 
     if (servoButton.getUserAction() == ButtonAction::Release) {
-        Serial.println("Moving servo..");
         servoControl.moveToColor(categoryDetected);
     }
 }
@@ -78,34 +81,20 @@ void ProcessServoButton() {
 void ProcessStepperButton() {
     stepperButton.processState();
 
-    if (stepperButton.getUserAction() == ButtonAction::Release) {
-      stepperControl.doCapStep();
-    }
-    
-/*
     if (stepperButton.getUserAction() == ButtonAction::Hold) {
-        if (stepperButton.getCyclesHeld() >= 150 and stepperControl.getCurrentAction() == StepperActions::Resting) {
+        if (stepperButton.getSecondsHeld() >= 3 and stepperControl.getCurrentAction() == StepperActions::Resting) {
             stepperControl.doCycling();
-            Serial.println("Cycling.");
-            encoderControl.resetRotation();
+            //encoderControl.resetRotation();
         }
     } else if (stepperButton.getUserAction() == ButtonAction::Release) {
         if (stepperControl.getCurrentAction() == StepperActions::Resting) {
             stepperControl.doCapStep();
-            Serial.println("Cap Step.");
-            encoderControl.resetRotation();
+            //encoderControl.resetRotation();
         } else if (stepperControl.getCurrentAction() == StepperActions::Cycling) {
             stepperControl.stopActions();
-            Serial.println("Stopping.");
         }
     }
 
-    if (stepperControl.getCurrentAction() == StepperActions::Stopping) {
-        char* angleStr;
-        sprintf(angleStr, "%s%d%s", "Stepper moved ", encoderControl.getAngle(), " degrees.");
-        Serial.println(angleStr);
-    }
-*/
     stepperControl.processState();
 }
 
@@ -113,9 +102,8 @@ void ProcessSensorButton() {
     sensorButton.processState();
 
     if (sensorButton.getUserAction() == ButtonAction::Release) {
-        Serial.println("Reading color.");
-        categoryDetected = ReadColorDummy();
-        //categoryDetected = ReadColor();
+        categoryDetected = ReadColor();
+        displayControl.setLineText(ConvertColorCategoryToChar(categoryDetected), 1, TextAlignment::Right);
     }
 }
 
@@ -124,6 +112,9 @@ void ProcessPanicButton() {
 
     if (panicButton.getUserAction() == ButtonAction::Release) {
         stepperControl.stopActions();
-        Serial.println("PANIK!!!");
     }
+}
+
+void ProcessDisplayState() {
+    displayControl.processState();
 }
