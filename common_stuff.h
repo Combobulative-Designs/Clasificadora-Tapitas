@@ -1,6 +1,8 @@
 #ifndef CLASIFICADORA_COMMON_STUFF_H
 #define CLASIFICADORA_COMMON_STUFF_H
 
+
+enum class MenuUserActions {Next, Previous, Enter, Return};
 enum class RotationDirection {Clockwise, CounterClockwise};
 enum class ButtonAction {Press, Hold, Release, Rest};
 enum class TextAlignment {Left, Right, Center};
@@ -8,6 +10,13 @@ enum class ColorCategory {
     Reds, Yellows, Blues,
     Greens, Whites, Greys,
     Blacks
+};
+enum class MenuActions {
+    RunAuto, RunStep, DoSensorReading, DoServoTurn,
+    DoStepperCapStep, DoStepperCWCycling, DoStepperCCWCycling,
+    ShowTime, ShowAmountTotal, ShowAmountReds, ShowAmountBlues,
+    ShowAmountGreens, ShowAmountYellows, ShowAmountBlacks,
+    ShowAmountWhites, ShowAmountGreys, NavigateToId, None
 };
 
 class ButtonState {

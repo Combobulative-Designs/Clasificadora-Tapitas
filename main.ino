@@ -10,10 +10,15 @@
 #include "display_control.h"
 #include "menu_control.h"
 
-#define PIN_STEPPER_BUTTON 2
+/*#define PIN_STEPPER_BUTTON 2
 #define PIN_SERVO_BUTTON 3
 #define PIN_SENSOR_BUTTON 4
-#define PIN_PANIC_BUTTON 5
+#define PIN_PANIC_BUTTON 5*/
+
+#define PIN_BUTTON_PREV 2
+#define PIN_BUTTON_NEXT 3
+#define PIN_BUTTON_RETURN 4
+#define PIN_BUTTON_ENTER 5
 
 #define PIN_ENCODER_CLK 6
 #define PIN_ENCODER_DT 7
@@ -70,12 +75,22 @@ const MenuItem menu[36] = {
         MenuItem(34, 29, 4, "Blancos", MenuItemActions::ShowAmountWhites),
         MenuItem(35, 29, 5, "Grises", MenuItemActions::ShowAmountGreys),
         MenuItem(36, 29, 6, "Negros", MenuItemActions::ShowAmountBlacks)
+
+
 };
 
-ButtonState sensorButton;
+// Codigo para pruebas con operacion por boton:
+/*ButtonState sensorButton;
 ButtonState servoButton;
 ButtonState stepperButton;
-ButtonState panicButton;
+ButtonState panicButton;*/
+
+
+// Codigo para operacion por menu
+ButtonState buttonPrev;
+ButtonState buttonNext;
+ButtonState buttonReturn;
+ButtonState buttonEnter;
 
 RotaryEncoderControl encoderControl;
 StepperControl stepperControl(PIN_STEPPER_IN1, PIN_STEPPER_IN2, PIN_STEPPER_IN3, PIN_STEPPER_IN4);
@@ -118,14 +133,63 @@ void setup() {
 }
 
 void loop() {
-    ProcessServoButton();
+    /*ProcessServoButton();
     ProcessStepperButton();
     ProcessSensorButton();
-    ProcessPanicButton();
-    ProcessDisplayState();
+    ProcessPanicButton();*/
+
+    /*ProcessButtonsState();
+    ProcessMenuState();
+    ProcessDisplayState();*/
+
+
+    buttonPrev.processState();
+    buttonNext.processState();
+    buttonReturn.processState();
+    buttonEnter.processState();
+
+    if (buttonPrev.getUserAction() == ButtonAction::Release) menuControler.triggerUserAction(MenuUserActions::Next);
+    if (buttonNext.getUserAction() == ButtonAction::Release) menuControler.triggerUserAction(MenuUserActions::Next);
+    if (buttonReturn.getUserAction() == ButtonAction::Release) menuControler.triggerUserAction(MenuUserActions::Next);
+    if (buttonEnter.getUserAction() == ButtonAction::Release) menuControler.triggerUserAction(MenuUserActions::Next);
+
+
+    menuControl.processState();
+
+    displayControl.processState();
 }
 
+/*void ProcessButtonsState() {
+    buttonPrev.processState();
+    buttonNext.processState();
+    buttonReturn.processState();
+    buttonEnter.processState();
 
+    if (buttonPrev.getUserAction() == ButtonAction::Release) menuControler.triggerUserAction(MenuUserActions::Next);
+    if (buttonNext.getUserAction() == ButtonAction::Release) menuControler.triggerUserAction(MenuUserActions::Next);
+    if (buttonReturn.getUserAction() == ButtonAction::Release) menuControler.triggerUserAction(MenuUserActions::Next);
+    if (buttonEnter.getUserAction() == ButtonAction::Release) menuControler.triggerUserAction(MenuUserActions::Next);
+}
+
+void ProcessMenuState() {
+    menuControl.processState();
+}
+
+void ProcessDisplayState() {
+    if (displayControl.rested()) {
+        displayControl.processState();
+    }
+}*/
+
+
+
+
+
+
+
+
+
+/*
 void ProcessServoButton() {
     servoButton.processState();
 
@@ -176,4 +240,4 @@ void ProcessDisplayState() {
     if (displayControl.rested()) {
         displayControl.processState();
     }
-}
+}*/

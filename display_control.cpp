@@ -132,7 +132,7 @@ void DisplayControl::processState() {
     }
 }
 
-void DisplayControl::setLineText(char p_text[], int p_lineIndex, TextAlignment p_alignment) {
+void DisplayControl::setLineText(char p_text[], int p_lineIndex, enum TextAlignment p_alignment) {
     lines[p_lineIndex].completeLine = p_text;
     lines[p_lineIndex].alignment = p_alignment;
 }

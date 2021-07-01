@@ -1,28 +1,19 @@
+#include "common_stuff.h"
+
 #include "display_control.h"
 
 #ifndef CLASIFICADORA_TI3_MENU_CONTROL_H
 #define CLASIFICADORA_TI3_MENU_CONTROL_H
 
-enum class MenuItemActions {
-    RunAuto, RunStep, DoSensorReading, DoServoTurn,
-    DoStepperCapStep, DoStepperCWCycling, DoStepperCCWCycling,
-    ShowTime, ShowAmountTotal, ShowAmountReds, ShowAmountBlues,
-    ShowAmountGreens, ShowAmountYellows, ShowAmountBlacks,
-    ShowAmountWhites, ShowAmountGreys, NavigateDown, None
-};
-enum class MenuActions {
-    Next, Previous, Enter, Cancel
-};
-
 class MenuItem {
 public:
-    MenuItem(int p_id, int p_parent_id, int p_sibling_index, char p_text[], MenuItemActions p_action);
+    MenuItem(int p_id, int p_parent_id, int p_sibling_index, char p_text[], enum MenuActions p_action);
 
     int getId();
     int getParentId();
     int getSiblingIndex();
     char* getText();
-    MenuItemActions getAction();
+    enum MenuActions getAction();
 
     int getNextSiblingId(MenuItem p_menu[]);
     int getPrevSiblingId(MenuItem p_menu[]);
@@ -35,53 +26,46 @@ private:
     int parentId;
     int siblingIndex;
     char text[];
-    MenuItemActions action;
+    enum MenuActions action;
 };
 
 class MenuControl {
 public:
-    MenuControl(MenuItem p_menu[], DisplayControl &displayControl);
+    MenuControl(MenuItem p_menu[], DisplayControl &displayControl, );
 
     void processState();
-    void processActions();
     void initialize();
-    void triggerAction(MenuItemActions p_action);
+    void triggerUserAction(enum MenuUserActions p_user_action);
 
-    MenuItemActions getLastTriggeredAction();
-    MenuItemActions getCurrTriggeredAction();
-    int getLastMenuItemId();
-    int getCurrMenuItemId();
+    enum MenuActions getCurrentAction();
+    int getCurrentMenuItemId();
     MenuItem getMenuItem(int p_id);
 
     bool locked();
-    bool resting();
+    bool rested();
+    bool inactive();
     bool canGoBack();
-
-    void moveUp();
-    void moveDown();
-    void moveNext();
-    void movePrev();
 
     void setLock(int p_duration);
 
 private:
     MenuItem menu[];
-    MenuItemActions lastTriggeredAction;
-    MenuItemActions currTriggeredAction;
-    int lastMenuItemId;
-    int currMenuItemId;
+    enum MenuActions currentAction;
+    int currentMenuItemId;
     bool initialized;
+    bool stateChanged;
 
     int lockDuration;
     unsigned long lockFrom;
 
     int inactivityTimer;
+    int restDelay;
     unsigned long lastActivity;
 
     DisplayControl &displayControl;
 
-    void moveTo(int p_id);
-    void printToScreen();
+    void printToScreenMenuItem();
+    //void printToScreenOperation(bool p_cancelable);
 
 };
 

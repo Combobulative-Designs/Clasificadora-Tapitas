@@ -33,7 +33,7 @@ public:
     void initialize();
     void processState();
 
-    void setLineText(char p_text[], int p_lineIndex, TextAlignment p_alignment);
+    void setLineText(char p_text[], int p_lineIndex, enum TextAlignment p_alignment);
     void navArrows();
     void noNavArrows();
     LiquidCrystal_I2C i2c_display;

@@ -1,10 +1,11 @@
 #include <Arduino.h>
 
-#include "menu_control.h"
+#include "common_stuff.h"
 
 #include "display_control.h"
+#include "menu_control.h"
 
-MenuItem::MenuItem(int p_id, int p_parent_id, int p_sibling_index, char p_text[], MenuItemActions p_action) :
+MenuItem::MenuItem(int p_id, int p_parent_id, int p_sibling_index, char p_text[], enum MenuItemActions p_action) :
     id(p_id),
     parentId(p_parent_id),
     siblingIndex(p_sibling_index),
@@ -16,7 +17,7 @@ int MenuItem::getId() {return id;}
 int MenuItem::getParentId() {return parentId;}
 int MenuItem::getSiblingIndex() {return siblingIndex;}
 char * MenuItem::getText() {return text;}
-MenuItemActions MenuItem::getAction() {return action;}
+enum MenuItemActions MenuItem::getAction() {return action;}
 
 int MenuItem::getSiblingCount(MenuItem p_menu[]) {
     int nodeCounter = 0;
@@ -61,122 +62,22 @@ int MenuItem::getPrevSiblingId(MenuItem p_menu[]) {
 
 MenuControl::MenuControl(MenuItem p_menu[], DisplayControl &p_displayControl) :
     menu(p_menu),
-    lastTriggeredAction(MenuItemActions::None),
-    currTriggeredAction(MenuItemActions::None),
+    currentAction(MenuActions::None),
     initialized(false),
+    stateChanged(false),
     lockDuration(0),
-    inactivityTimer(15000)
-    {
-        displayControl = p_displayControl
-    }
-
-bool MenuControl::locked() {
-    if (lockDuration == 0) return false;
-    return (millis() >= lockFrom + lockDuration);
-}
-bool MenuControl::resting() {
-    if (inactivityTimer == 0) return inactivity;
-    return (millis() >= lastActivity + inactivityTimer);
-}
-bool MenuControl::canGoBack() {
-    return (getMenuItem(getMenuItem(getCurrMenuItemId()).getParentId()).getParentId() != 0);
-}
-
-void MenuControl::moveDown() { currMenuItemId = getMenuItem(getCurrMenuItemId()).getFirstChild(menu); }
-void MenuControl::moveUp() { currMenuItemId = getMenuItem(getCurrMenuItemId()).getParentId(); }
-void MenuControl::moveNext() { currMenuItemId = getMenuItem(getCurrMenuItemId()).getNextSiblingId(menu); }
-void MenuControl::movePrev() { currMenuItemId = getMenuItem(getCurrMenuItemId()).getPrevSiblingId(menu); }
-
-void MenuControl::moveTo(int p_id) {
-    currMenuItemId = p_id;
-}
-
-void MenuControl::setLock(int p_duration) { lockDuration = p_duration; lockFrom = millis(); }
-
-void MenuControl::printToScreen() {
-    if (getMenuItem(getCurrMenuItem()).getSiblingCount() > 1) {
-        displayControl.navArrows();
-    } else {
-        displayControl.noNavArrows();
-    }
-
-    displayControl.setLineText(
-            getMenuItem(getMenuItem(getCurrMenuItemId()).getParentId()).getText(),
-            0,
-            TextAlignment::Center);
-    displayControl.setLineText(
-            getMenuItem(getCurrMenuItemId()).getText(),
-            1,
-            TextAlignment::Center);
-}
-
-MenuItemActions MenuControl::getLastTriggeredAction() { return lastTriggeredAction; }
-MenuItemActions MenuControl::getCurrTriggeredAction() { return currTriggeredAction; }
-int MenuControl::getLastMenuItemId() { return lastMenuItemId; }
-int MenuControl::getCurrMenuItemId() { return currMenuItemId; }
-
-MenuItem MenuControl::getMenuItem(int p_id) {
-    for (const MenuItem &menuItem : menu) {
-        if (menuItem.getId() == id) return menuItem;
-    }
-}
-
-void MenuControl::triggerAction(MenuItemActions p_action) {
-    switch (p_action) {
-        case MenuItemActions::RunAuto:
-            break;
-        case MenuItemActions::RunStep:
-            break;
-        case MenuItemActions::DoSensorReading:
-            break;
-        case MenuItemActions::DoServoTurn:
-            break;
-        case MenuItemActions::DoStepperCapStep:
-            break;
-        case MenuItemActions::DoStepperCWCycling:
-            break;
-        case MenuItemActions::DoStepperCCWCycling:
-            break;
-        case MenuItemActions::ShowTime:
-            break;
-        case MenuItemActions::ShowAmountTotal:
-            break;
-        case MenuItemActions::ShowAmountReds:
-            break;
-        case MenuItemActions::ShowAmountBlues:
-            break;
-        case MenuItemActions::ShowAmountGreens:
-            break;
-        case MenuItemActions::ShowAmountYellows:
-            break;
-        case MenuItemActions::ShowAmountBlacks:
-            break;
-        case MenuItemActions::ShowAmountWhites:
-            break;
-        case MenuItemActions::ShowAmountGreys:
-            break;
-        case MenuItemActions::NavigateDown:
-            moveDown();
-            break;
-        case MenuItemActions::None:
-            break;
-        default:
-            break;
-    }
-}
+    inactivityTimer(15000),
+    restDelay(50)
+ { displayControl = p_displayControl; }
 
 void MenuControl::initialize() {
     if (!initialized) {
         Serial.print("Initializing menu.");
-        lastTriggeredAction = MenuItemActions::None;
-        currTriggeredAction = MenuItemActions::None;
 
-        lastMenuItemId = 1;
-        currMenuItemId = 1;
-
+        currentMenuItemId = 1;
         lastActivity = millis();
 
-        printToScreen();
+        printToScreenMenuItem();
 
         initialized = true;
     } else {
@@ -184,21 +85,128 @@ void MenuControl::initialize() {
     }
 }
 
+void MenuControl::triggerUserAction(enum MenuUserActions p_user_action) {
+    if (initialized) {
+        if (rested() and stateChanged) {
+            if (!locked()) {
+                stateChanged = true;
+                lastActivity = millis();
+                switch (p_user_action) {
+                    case MenuUserActions::Previous:
+                        currentMenuItemId = getMenuItem(currentMenuItemId).getPrevSiblingId(menu);
+                        currentAction = MenuActions::NavigateToId;
+                        break;
+                    case MenuUserActions::Next:
+                        currentMenuItemId = getMenuItem(currentMenuItemId).getNextSiblingId(menu);
+                        currentAction = MenuActions::NavigateToId;
+                        break;
+                    case MenuUserActions::Return:
+                        if (currentAction == MenuActions::NavigateToId and canGoBack()) {
+                            currentMenuItemId = getMenuItem(currentMenuItemId).getParentId();
+                        }
+                        currentAction = MenuActions::NavigateToId;
+                        break;
+                    default:
+                        currentAction = getMenuItem(currentMenuItemId).getAction();
+                        break;
+                }
+            } else {
+                Serial.println("Menu locked.");
+            }
+        }
+    }
+    else {
+        Serial.println("Menu not initialized.");
+    }
+}
+
+bool MenuControl::locked() { if (lockDuration == 0) return false; return (millis() >= lockFrom + lockDuration); }
+bool MenuControl::rested() { return (millis() >= lastActivity + restDelay); }
+bool MenuControl::inactive() { if (inactivityTimer == 0) return false; return (millis() >= lastActivity + inactivityTimer); }
+bool MenuControl::canGoBack() { return (getMenuItem(getMenuItem(currentMenuItemId).getParentId()).getParentId() != 0); }
+
+enum MenuActions MenuControl::getCurrentAction() { return currentAction; }
+int MenuControl::getCurrentMenuItemId() { return currentMenuItemId; }
+MenuItem MenuControl::getMenuItem(int p_id) {
+    for (const MenuItem &menuItem : menu) {
+        if (menuItem.getId() == id) return menuItem;
+    }
+}
+
+void MenuControl::setLock(int p_duration) { lockDuration = p_duration; lockFrom = millis(); }
+
+void MenuControl::printToScreenMenuItem() {
+    if (getMenuItem(currentMenuItemId).getSiblingCount() > 1) {
+        displayControl.navArrows();
+    } else {
+        displayControl.noNavArrows();
+    }
+
+    displayControl.setLineText(
+            getMenuItem(getMenuItem(currentMenuItemId).getParentId()).getText(),
+            0,
+            TextAlignment::Center);
+    displayControl.setLineText(
+            getMenuItem(currentMenuItemId).getText(),
+            1,
+            TextAlignment::Center);
+}
+
 void MenuControl::processState() {
     if (initialized) {
-        if (currMenuItemId != lastMenuItemId) {
-            printToScreen()
+        if (stateChanged) {
+            lastActivity = millis();
+            switch (currentAction) {
+                case MenuActions::RunAuto:
+                    displayControl.noNavArrows();
+                    displayControl.setLineText("Clasificando", 0, TextAlignment::Center);
+                    displayControl.setLineText("**", 0, TextAlignment::Center);
+                    break;
+                case MenuActions::RunStep:
+                    displayControl.noNavArrows();
+                    displayControl.setLineText("Un paso...", 0, TextAlignment::Center);
+                    displayControl.setLineText("**", 0, TextAlignment::Center);
+                    break;
+                case MenuActions::DoSensorReading:
+                    break;
+                case MenuActions::DoServoTurn:
+                    break;
+                case MenuActions::DoStepperCapStep:
+                    break;
+                case MenuActions::DoStepperCWCycling:
+                    break;
+                case MenuActions::DoStepperCCWCycling:
+                    break;
+                case MenuActions::ShowTime:
+                    displayControl.noNavArrows();
+                    displayControl.setLineText("Tiempo total:", 0, TextAlignment::Center);
+                    displayControl.setLineText((char *)(milis() / 1000), 0, TextAlignment::Center);
+                    break;
+                case MenuActions::ShowAmountTotal:
+                    break;
+                case MenuActions::ShowAmountReds:
+                    break;
+                case MenuActions::ShowAmountBlues:
+                    break;
+                case MenuActions::ShowAmountGreens:
+                    break;
+                case MenuActions::ShowAmountYellows:
+                    break;
+                case MenuActions::ShowAmountBlacks:
+                    break;
+                case MenuActions::ShowAmountWhites:
+                    break;
+                case MenuActions::ShowAmountGreys:
+                    break;
+                case MenuActions::NavigateToId:
+                    printToScreenMenuItem();
+                    break;
+                default:
+                    break;
+            }
         }
-
-
-
-
-
-
-
-
     } else {
-        Serial.print("Menu not initialized.")
+        Serial.println("Menu not initialized.");
     }
 }
 
