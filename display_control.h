@@ -34,6 +34,8 @@ public:
     void processState();
 
     void setLineText(char p_text[], int p_lineIndex, TextAlignment p_alignment);
+    void navArrows();
+    void noNavArrows();
     LiquidCrystal_I2C i2c_display;
     unsigned long getLastWrite();
     bool rested();
@@ -47,6 +49,8 @@ private:
     int restDelay;
     unsigned long lastWrite;
     bool stateChanged;
+    bool showNavArrows;
+    bool backlightState;
 };
 
 #endif //CLASIFICADORA_TI3_DISPLAY_CONTROL_H

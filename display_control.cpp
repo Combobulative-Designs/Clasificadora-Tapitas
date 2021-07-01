@@ -46,7 +46,8 @@ DisplayControl::DisplayControl(byte p_address, int p_columns, int p_rows, int p_
         lines({TextLine(), TextLine()}),
         lastWrite(millis()),
         restDelay(p_rest_delay),
-        stateChanged(false)
+        stateChanged(false),
+        backlightState(false)
 {}
 TextLine::TextLine() :
         alignment(TextAlignment::Left),
@@ -60,6 +61,7 @@ void DisplayControl::initialize() {
         i2c_display.backlight();
         i2c_display.print("Initializing...");
         i2c_display.noCursor();
+        backlightState = true
         initialized = true;
         i2c_display.createChar(1, arrow_left);
         i2c_display.createChar(2, arrow_right);
@@ -101,6 +103,9 @@ void TextLine::generateVisibleLine(int p_columns) {
 }
 
 void DisplayControl::processState() {
+    if (backlightState and rested()) {i2c_display.noBacklight(); backlightState = false; }
+    else if ((!backlightState) and (!rested())) {i2c_display.backlight(); backlightState = true; }
+
     for (int row=0; row<rows; ++row) {
         if (lines[row].completeLine != lines[row].oldCompleteLine) {
             lines[row].oldCompleteLine = lines[row].completeLine;
@@ -117,12 +122,13 @@ void DisplayControl::processState() {
         i2c_display.print(lines[0].visibleLine);
         i2c_display.setCursor(0, 1);
         i2c_display.print(lines[1].visibleLine);
-        /*
-        i2c_display.setCursor(0, 1);
-        i2c_display.write(byte(1));
-        i2c_display.setCursor(15, 1);
-        i2c_display.write(byte(0));
-         */
+
+        if (showNavArrows) {
+            i2c_display.setCursor(0, 1);
+            i2c_display.write(byte(1));
+            i2c_display.setCursor(15, 1);
+            i2c_display.write(byte(0));
+        }
     }
 }
 
@@ -130,5 +136,8 @@ void DisplayControl::setLineText(char p_text[], int p_lineIndex, TextAlignment p
     lines[p_lineIndex].completeLine = p_text;
     lines[p_lineIndex].alignment = p_alignment;
 }
+
+void DisplayControl::navArrows() { showNavArrows = true; }
+void DisplayControl::noNavArrows() { showNavArrows = false; }
 
 bool DisplayControl::rested() {return (lastWrite + restDelay <= millis());}

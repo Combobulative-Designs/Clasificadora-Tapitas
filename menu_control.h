@@ -1,3 +1,5 @@
+#include "display_control.h"
+
 #ifndef CLASIFICADORA_TI3_MENU_CONTROL_H
 #define CLASIFICADORA_TI3_MENU_CONTROL_H
 
@@ -6,7 +8,10 @@ enum class MenuItemActions {
     DoStepperCapStep, DoStepperCWCycling, DoStepperCCWCycling,
     ShowTime, ShowAmountTotal, ShowAmountReds, ShowAmountBlues,
     ShowAmountGreens, ShowAmountYellows, ShowAmountBlacks,
-    ShowAmountWhites, ShowAmountGreys, None
+    ShowAmountWhites, ShowAmountGreys, NavigateDown, None
+};
+enum class MenuActions {
+    Next, Previous, Enter, Cancel
 };
 
 class MenuItem {
@@ -35,10 +40,12 @@ private:
 
 class MenuControl {
 public:
-    MenuControl(MenuItem p_menu[]);
+    MenuControl(MenuItem p_menu[], DisplayControl &displayControl);
 
     void processState();
+    void processActions();
     void initialize();
+    void triggerAction(MenuItemActions p_action);
 
     MenuItemActions getLastTriggeredAction();
     MenuItemActions getCurrTriggeredAction();
@@ -46,10 +53,16 @@ public:
     int getCurrMenuItemId();
     MenuItem getMenuItem(int p_id);
 
+    bool locked();
+    bool resting();
+    bool canGoBack();
+
     void moveUp();
     void moveDown();
     void moveNext();
     void movePrev();
+
+    void setLock(int p_duration);
 
 private:
     MenuItem menu[];
@@ -59,7 +72,16 @@ private:
     int currMenuItemId;
     bool initialized;
 
+    int lockDuration;
+    unsigned long lockFrom;
+
+    int inactivityTimer;
+    unsigned long lastActivity;
+
+    DisplayControl &displayControl;
+
     void moveTo(int p_id);
+    void printToScreen();
 
 };
 
