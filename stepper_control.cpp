@@ -7,7 +7,15 @@
 
 #include "stepper_control.h"
 
-StepperControl::StepperControl(int p_pinIN1, int p_pinIN2, int p_pinIN3, int p_pinIN4) : initialized(false), positionCounter(0), nextPosition(0), actionChange(false), currentAction(StepperActions::Resting), previousAction(StepperActions::Resting), stepper(8, p_pinIN1, p_pinIN3, p_pinIN2, p_pinIN4) {}
+StepperControl::StepperControl(int p_pinIN1, int p_pinIN2, int p_pinIN3, int p_pinIN4) :
+    initialized(false),
+    positionCounter(0),
+    nextPosition(0),
+    actionChange(false),
+    currentAction(StepperActions::Resting),
+    previousAction(StepperActions::Resting),
+    stepper(8, p_pinIN1, p_pinIN3, p_pinIN2, p_pinIN4)
+    {}
 
 StepperActions StepperControl::getCurrentAction() {return currentAction;}
 

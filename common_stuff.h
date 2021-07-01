@@ -14,10 +14,12 @@ class ButtonState {
 public:
     ButtonState();
 
-    void attach(int p_pin_button);
+    void attach(int p_pin_button, int p_debounce_delay);
     int getState();
     ButtonAction getUserAction();
-    int getSecondsHeld();
+    int getCyclesHeld();
+    unsigned long getLastReading();
+    bool debounced();
 
     void processState();
 
@@ -26,15 +28,13 @@ private:
 
     bool initialized;
     int state;
-    int newState;
     enum ButtonAction userAction;
-    int secondsHeld;
-
-    unsigned long previousMillis; 
+    int cyclesHeld;
+    unsigned long lastReading;
+    int debounceDelay;
 };
 
-void I2CScanner();
+int I2CScanner(byte addrs[]);
 char* ConvertColorCategoryToChar(ColorCategory category);
-char* RepeatChar(char p_char, int p_repetitions);
 
 #endif //CLASIFICADORA_COMMON_STUFF_H

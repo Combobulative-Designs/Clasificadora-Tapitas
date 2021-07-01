@@ -3,13 +3,20 @@
 
 #include "common_stuff.h"
 
-ButtonState::ButtonState() : pinButton(0), state(0), newState(0), secondsHeld(0), initialized(false), previousMillis(0) {}
+ButtonState::ButtonState() :
+    pinButton(0),
+    state(0),
+    cyclesHeld(0),
+    initialized(false),
+    lastReading(millis())
+    {}
 
-void ButtonState::attach(int p_pin_button) {
+void ButtonState::attach(int p_pin_button, int p_debounce_delay) {
     if (!initialized) {
         Serial.println("Attaching button.");
 
         pinButton = p_pin_button;
+        debounceDelay = p_debounce_delay;
         pinMode(pinButton, INPUT);
 
         initialized = true;
@@ -20,28 +27,19 @@ void ButtonState::attach(int p_pin_button) {
 
 void ButtonState::processState() {
     if (initialized) {
-        newState = digitalRead(pinButton);
+        lastReading = millis();
+        int newState = digitalRead(pinButton);
 
         if (newState == HIGH && state == LOW) {
             userAction = ButtonAction::Press;
-            previousMillis = 0;
-            secondsHeld = 0;
-            Serial.println("Button pressed.");
         } else if (newState == HIGH && state == HIGH) {
             userAction = ButtonAction::Hold;
-            //Serial.println("Button on hold.");
-            if (millis() >= previousMillis + 1000) {
-                previousMillis = millis();
-                secondsHeld += 1  ;
-            }
+            cyclesHeld += 1;
         } else if (newState == LOW && state == HIGH) {
             userAction = ButtonAction::Release;
-            Serial.println("Button released.");
-            previousMillis = 0;
+            cyclesHeld = 0;
         } else if (newState == LOW && state == LOW) {
             userAction = ButtonAction::Rest;
-            secondsHeld = 0;
-            //Serial.println("Button resting.");
         }
 
         state = newState;
@@ -51,10 +49,12 @@ void ButtonState::processState() {
 }
 
 int ButtonState::getState() {return state;}
-int ButtonState::getSecondsHeld() {return secondsHeld;}
+int ButtonState::getCyclesHeld() {return cyclesHeld;}
+unsigned long ButtonState::getLastReading() {return lastReading;}
 ButtonAction ButtonState::getUserAction() {return userAction;}
+bool ButtonState::debounced() {return (lastReading + debounceDelay <= millis());}
 
-void I2CScanner() {
+int I2CScanner(byte addrs[]) {
     Wire.begin();
 
     byte errCode, addr;
@@ -75,6 +75,7 @@ void I2CScanner() {
             Serial.print(addr,HEX);
             Serial.println(".");
 
+            addrs[devCount] = addr;
             devCount++;
 
         } else if (errCode == 4) {
@@ -94,33 +95,24 @@ void I2CScanner() {
     }
 
     Wire.end();
+    return devCount;
 }
 
 char* ConvertColorCategoryToChar(ColorCategory p_category) {
     switch (p_category) {
         case ColorCategory::Reds:
-            return (char*)"Reds";
+            return "Reds";
         case ColorCategory::Yellows:
-            return (char*)"Yellows";
+            return "Yellows";
         case ColorCategory::Blues:
-            return (char*)"Blues";
+            return "Blues";
         case ColorCategory::Greens:
-            return (char*)"Greens";
+            return "Greens";
         case ColorCategory::Whites:
-            return (char*)"Whites";
+            return "Whites";
         case ColorCategory::Greys:
-            return (char*)"Greys";
+            return "Greys";
         default: //Blacks
-            return (char*)"Blacks";
+            return "Blacks";
     }
-}
-
-char* RepeatChar(char p_char, int p_repetitions) {
-    char* resutlingString;
-
-    for (int i = 0; i < p_repetitions; i++) {
-        resutlingString += p_char;
-    }
-
-    return resutlingString;
 }
