@@ -56,18 +56,18 @@ TextLine::TextLine() :
 
 void DisplayControl::initialize() {
     if (!initialized) {
-        Serial.println("Initializing display..");
+        Serial.println(F("Initializing display.."));
         i2c_display.init();
         i2c_display.backlight();
-        i2c_display.print("Initializing...");
+        i2c_display.print(F("Initializing..."));
         i2c_display.noCursor();
-        backlightState = true
+        backlightState = true;
         initialized = true;
         i2c_display.createChar(1, arrow_left);
         i2c_display.createChar(2, arrow_right);
         i2c_display.createChar(3, arrow_return);
     } else {
-        Serial.println("Display already initialized.");
+        Serial.println(F("Display already initialized."));
     }
 }
 

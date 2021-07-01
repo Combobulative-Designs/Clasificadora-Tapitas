@@ -7,7 +7,8 @@
 
 class MenuItem {
 public:
-    MenuItem(int p_id, int p_parent_id, int p_sibling_index, char p_text[], enum MenuActions p_action);
+    MenuItem();
+    MenuItem(int p_id, int p_parent_id, int p_sibling_index, char p_text[17], enum MenuActions p_action);
 
     int getId();
     int getParentId();
@@ -15,23 +16,23 @@ public:
     char* getText();
     enum MenuActions getAction();
 
-    int getNextSiblingId(MenuItem p_menu[]);
-    int getPrevSiblingId(MenuItem p_menu[]);
-    int getSiblingCount(MenuItem p_menu[]);
+    int getNextSiblingId(MenuItem p_menu[36]);
+    int getPrevSiblingId(MenuItem p_menu[36]);
+    int getSiblingCount(MenuItem p_menu[36]);
 
-    int getFirstChild(MenuItem p_menu[]);
+    int getFirstChild(MenuItem p_menu[36]);
 
 private:
     int id;
     int parentId;
     int siblingIndex;
-    char text[];
     enum MenuActions action;
+    char text[17];
 };
 
 class MenuControl {
 public:
-    MenuControl(MenuItem p_menu[], DisplayControl &displayControl, );
+    MenuControl(MenuItem p_menu[36], DisplayControl &displayControl);
 
     void processState();
     void initialize();
@@ -49,7 +50,7 @@ public:
     void setLock(int p_duration);
 
 private:
-    MenuItem menu[];
+    MenuItem menu[36];
     enum MenuActions currentAction;
     int currentMenuItemId;
     bool initialized;
@@ -65,8 +66,6 @@ private:
     DisplayControl &displayControl;
 
     void printToScreenMenuItem();
-    //void printToScreenOperation(bool p_cancelable);
-
 };
 
 #endif //CLASIFICADORA_TI3_MENU_CONTROL_H

@@ -5,31 +5,45 @@
 #include "display_control.h"
 #include "menu_control.h"
 
-MenuItem::MenuItem(int p_id, int p_parent_id, int p_sibling_index, char p_text[], enum MenuItemActions p_action) :
-    id(p_id),
-    parentId(p_parent_id),
-    siblingIndex(p_sibling_index),
-    text(p_text),
-    action(p_action)
-{}
+MenuItem::MenuItem() :
+        id(0),
+        parentId(0),
+        siblingIndex(0),
+        action(MenuActions::None)
+{
+    for (int i = 0; i < 17; i++) {
+        text[i] = ' ';
+    }
+    text[16] = (char)0;
+}
+MenuItem::MenuItem(int p_id, int p_parent_id, int p_sibling_index, char p_text[17], enum MenuActions p_action) :
+        id(p_id),
+        parentId(p_parent_id),
+        siblingIndex(p_sibling_index),
+        action(p_action)
+{
+    for (int i = 0; i < 17; i++) {
+        text[i] = p_text[i];
+    }
+}
 
 int MenuItem::getId() {return id;}
 int MenuItem::getParentId() {return parentId;}
 int MenuItem::getSiblingIndex() {return siblingIndex;}
 char * MenuItem::getText() {return text;}
-enum MenuItemActions MenuItem::getAction() {return action;}
+enum MenuActions MenuItem::getAction() {return action;}
 
 int MenuItem::getSiblingCount(MenuItem p_menu[]) {
     int nodeCounter = 0;
-    for (const MenuItem &menuItem : p_menu) {
-        if (menuItem.getParentId() == parentId) nodeCounter++;
+    for (int i = 0; i < 36; i++) {
+        if (p_menu[i].getParentId() == parentId) nodeCounter++;
     }
     return nodeCounter;
 }
 
 int MenuItem::getFirstChild(MenuItem p_menu[]) {
-    for (const MenuItem &menuItem : p_menu) {
-        if (menuItem.getParentId() == id and menuItem.getSiblingIndex() == 0) return menuItem.getId();
+    for (int i = 0; i < 36; i++) {
+        if (p_menu[i].getParentId() == id and p_menu[i].getSiblingIndex() == 0) return p_menu[i].getId();
     }
     return 0;
 }
@@ -40,8 +54,9 @@ int MenuItem::getNextSiblingId(MenuItem p_menu[]) {
         siblingIndexTarget = 0;
     } else siblingIndexTarget = siblingIndex + 1;
 
-    for (const MenuItem &menuItem : p_menu) {
-        if (menuItem.getParentId() == id and menuItem.getSiblingIndex() == siblingIndexTarget) return menuItem.getId();
+
+    for (int i = 0; i < 36; i++) {
+        if (p_menu[i].getParentId() == id and p_menu[i].getSiblingIndex() == siblingIndexTarget) return p_menu[i].getId();
     }
     return id;
 }
@@ -52,27 +67,32 @@ int MenuItem::getPrevSiblingId(MenuItem p_menu[]) {
         siblingIndexTarget = getSiblingCount(p_menu) - 1;
     } else siblingIndexTarget = siblingIndex - 1;
 
-    for (const MenuItem &menuItem : p_menu) {
-        if (menuItem.getParentId() == id and menuItem.getSiblingIndex() == siblingIndexTarget) return menuItem.getId();
+
+    for (int i = 0; i < 36; i++) {
+        if (p_menu[i].getParentId() == id and p_menu[i].getSiblingIndex() == siblingIndexTarget) return p_menu[i].getId();
     }
     return id;
 }
 
 
 
-MenuControl::MenuControl(MenuItem p_menu[], DisplayControl &p_displayControl) :
-    menu(p_menu),
-    currentAction(MenuActions::None),
-    initialized(false),
-    stateChanged(false),
-    lockDuration(0),
-    inactivityTimer(15000),
-    restDelay(50)
- { displayControl = p_displayControl; }
+MenuControl::MenuControl(MenuItem p_menu[36], DisplayControl &p_displayControl) {
+    currentAction = MenuActions::None;
+    initialized = false;
+    stateChanged = false;
+    lockDuration = 0;
+    inactivityTimer = 15000;
+    restDelay = 50;
+    displayControl = p_displayControl;
+
+    for (int i = 0; i < 36; i++) {
+        menu[i] = p_menu[i];
+    }
+}
 
 void MenuControl::initialize() {
     if (!initialized) {
-        Serial.print("Initializing menu.");
+        Serial.print(F("Initializing menu."));
 
         currentMenuItemId = 1;
         lastActivity = millis();
@@ -81,7 +101,7 @@ void MenuControl::initialize() {
 
         initialized = true;
     } else {
-        Serial.print("Menu already initialized.")
+        Serial.print(F("Menu already initialized."));
     }
 }
 
@@ -111,12 +131,12 @@ void MenuControl::triggerUserAction(enum MenuUserActions p_user_action) {
                         break;
                 }
             } else {
-                Serial.println("Menu locked.");
+                Serial.println(F("Menu locked."));
             }
         }
     }
     else {
-        Serial.println("Menu not initialized.");
+        Serial.println(F("Menu not initialized."));
     }
 }
 
@@ -129,14 +149,14 @@ enum MenuActions MenuControl::getCurrentAction() { return currentAction; }
 int MenuControl::getCurrentMenuItemId() { return currentMenuItemId; }
 MenuItem MenuControl::getMenuItem(int p_id) {
     for (const MenuItem &menuItem : menu) {
-        if (menuItem.getId() == id) return menuItem;
+        if (menuItem.getId() == p_id) return menuItem;
     }
 }
 
 void MenuControl::setLock(int p_duration) { lockDuration = p_duration; lockFrom = millis(); }
 
 void MenuControl::printToScreenMenuItem() {
-    if (getMenuItem(currentMenuItemId).getSiblingCount() > 1) {
+    if (getMenuItem(currentMenuItemId).getSiblingCount(menu) > 1) {
         displayControl.navArrows();
     } else {
         displayControl.noNavArrows();
@@ -180,7 +200,7 @@ void MenuControl::processState() {
                 case MenuActions::ShowTime:
                     displayControl.noNavArrows();
                     displayControl.setLineText("Tiempo total:", 0, TextAlignment::Center);
-                    displayControl.setLineText((char *)(milis() / 1000), 0, TextAlignment::Center);
+                    displayControl.setLineText((char *)(millis() / 1000), 0, TextAlignment::Center);
                     break;
                 case MenuActions::ShowAmountTotal:
                     break;
@@ -206,7 +226,7 @@ void MenuControl::processState() {
             }
         }
     } else {
-        Serial.println("Menu not initialized.");
+        Serial.println(F("Menu not initialized."));
     }
 }
 

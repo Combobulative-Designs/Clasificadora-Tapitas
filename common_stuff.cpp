@@ -4,16 +4,16 @@
 #include "common_stuff.h"
 
 ButtonState::ButtonState() :
-    pinButton(0),
-    state(0),
-    cyclesHeld(0),
-    initialized(false),
-    lastReading(millis())
-    {}
+        pinButton(0),
+        state(0),
+        cyclesHeld(0),
+        initialized(false),
+        lastReading(millis())
+{}
 
 void ButtonState::attach(int p_pin_button, int p_debounce_delay) {
     if (!initialized) {
-        Serial.println("Attaching button.");
+        Serial.println(F("Attaching button."));
 
         pinButton = p_pin_button;
         debounceDelay = p_debounce_delay;
@@ -21,7 +21,7 @@ void ButtonState::attach(int p_pin_button, int p_debounce_delay) {
 
         initialized = true;
     } else {
-        Serial.println("Button already attached.");
+        Serial.println(F("Button already attached."));
     }
 }
 
@@ -44,7 +44,7 @@ void ButtonState::processState() {
 
         state = newState;
     } else {
-        Serial.println("Button not initialized.");
+        Serial.println(F("Button not initialized."));
     }
 }
 
@@ -60,7 +60,7 @@ int I2CScanner(byte addrs[]) {
     byte errCode, addr;
     int devCount;
 
-    Serial.println("Starting I2C scan.");
+    Serial.println(F("Starting I2C scan."));
 
     devCount = 0;
     for (addr = 1; addr < 127; addr++) {
@@ -68,9 +68,9 @@ int I2CScanner(byte addrs[]) {
         errCode = Wire.endTransmission();
 
         if (errCode == 0) {
-            Serial.print("Found I2C device at 0x");
+            Serial.print(F("Found I2C device at 0x"));
             if (addr<16) {
-                Serial.print("0");
+                Serial.print(F("0"));
             }
             Serial.print(addr,HEX);
             Serial.println(".");
@@ -79,19 +79,19 @@ int I2CScanner(byte addrs[]) {
             devCount++;
 
         } else if (errCode == 4) {
-            Serial.print("Weird error at 0x");
+            Serial.print(F("Weird error at 0x"));
             if (addr<16) {
-                Serial.print("0");
+                Serial.print(F("0"));
             }
             Serial.println(addr,HEX);
-            Serial.println(".");
+            Serial.println(F("."));
         }
 
     }
     if (devCount == 0) {
-        Serial.println("No devices found.");
+        Serial.println(F("No devices found."));
     } else {
-        Serial.println("Scan complete.");
+        Serial.println(F("Scan complete."));
     }
 
     Wire.end();

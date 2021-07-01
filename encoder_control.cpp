@@ -10,7 +10,7 @@ int RotaryEncoderControl::getAngle() {return abs(rotation * 30);}
 
 void RotaryEncoderControl::attach(int p_pin_clk, int p_pin_dt) {
     if (!initialized) {
-        Serial.println("Attaching rotary encoder.");
+        Serial.println(F("Attaching rotary encoder."));
 
         pinCLK = p_pin_clk;
         pinDT = p_pin_dt;
@@ -22,7 +22,7 @@ void RotaryEncoderControl::attach(int p_pin_clk, int p_pin_dt) {
 
         initialized = true;
     } else {
-        Serial.println("Rotary encoder already attached.");
+        Serial.println(F("Rotary encoder already attached."));
     }
 }
 
@@ -30,7 +30,7 @@ void RotaryEncoderControl::resetRotation() {
     if (initialized) {
         rotation = 0;
     } else {
-        Serial.println("Encoder not attached.");
+        Serial.println(F("Encoder not attached."));
     }
 }
 
@@ -50,6 +50,6 @@ void RotaryEncoderControl::processState() {
         }
         clkLastState = clkState;
     } else {
-        Serial.println("Encoder not attached.");
+        Serial.println(F("Encoder not attached."));
     }
 }

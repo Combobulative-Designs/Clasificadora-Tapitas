@@ -23,7 +23,7 @@ void InitSensor() {
 }
 
 enum ColorCategory ReadColor() {
-    Serial.println("Reading color (REAL):");
+    Serial.println(F("Reading color (REAL):"));
     RGB_t colorRGB = COLOR_getRGB();
     HSL_t colorHSL = COLOR_getHSLfromRGB(colorRGB);
     double saturation = colorHSL.saturation;
@@ -34,32 +34,32 @@ enum ColorCategory ReadColor() {
 
     if (luminosity >= ALT_LUMINOSITY_MIN_BLANCO && saturation < ALT_SATURATION_MAX_BLANCO) {
         category = ColorCategory::Whites;
-        Serial.println("WHITE.");
+        Serial.println(F("WHITE."));
     } else if (luminosity < ALT_LUMINOSITY_MAX_NEGRO && saturation < ALT_SATURATION_MAX_NEGRO) {
         category = ColorCategory::Blacks;
-        Serial.println("BLACK.");
+        Serial.println(F("BLACK."));
     } else if (luminosity < ALT_LUMINOSITY_MAX_GRIS && saturation < ALT_SATURATION_MAX_GRIS) {
         category = ColorCategory::Greys;
-        Serial.println("GREY.");
+        Serial.println(F("GREY."));
     } else {
         if (hue < ALT_MAX_HUE_ROJO) {
             category = ColorCategory::Reds;
-            Serial.println("RED.");
+            Serial.println(F("RED."));
         } else if (hue < ALT_MAX_HUE_NARANJA) {
             category = ColorCategory::Reds;
-            Serial.println("RED.");
+            Serial.println(F("RED."));
         } else if (hue < ALT_MAX_HUE_AMARILLO) {
             category = ColorCategory::Yellows;
-            Serial.println("YELLOW.");
+            Serial.println(F("YELLOW."));
         } else if (hue < ALT_MAX_HUE_VERDE) {
             category = ColorCategory::Greens;
-            Serial.println("GREEN.");
+            Serial.println(F("GREEN."));
         } else if (hue < ALT_MAX_HUE_AZUL) {
             category = ColorCategory::Blues;
-            Serial.println("BLUE.");
+            Serial.println(F("BLUE."));
         } else {
             category = ColorCategory::Reds;
-            Serial.println("RED.");
+            Serial.println(F("RED."));
         }
     }
 
