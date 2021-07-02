@@ -29,7 +29,8 @@ enum class MenuActions {
     ShowAmountWhites, 
     ShowAmountGreys, 
     NavigateToId, 
-    None
+    None,
+    NavigateDown
 };
 
 class ButtonState {
@@ -37,10 +38,10 @@ public:
     ButtonState();
 
     void attach(int p_pin_button, int p_debounce_delay);
-    int getState();
+    //int getState();
     ButtonAction getUserAction();
-    int getCyclesHeld();
-    unsigned long getLastReading();
+    //int getCyclesHeld();
+    //unsigned long getLastReading();
     bool debounced();
 
     void processState();
@@ -51,7 +52,7 @@ private:
     bool initialized;
     int state;
     enum ButtonAction userAction;
-    int cyclesHeld;
+    //int cyclesHeld;
     unsigned long lastReading;
     int debounceDelay;
 };

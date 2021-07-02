@@ -6,14 +6,14 @@
 ButtonState::ButtonState() :
         pinButton(0),
         state(0),
-        cyclesHeld(0),
+        //cyclesHeld(0),
         initialized(false),
         lastReading(millis())
 {}
 
 void ButtonState::attach(int p_pin_button, int p_debounce_delay) {
     if (!initialized) {
-        Serial.println(F("Attaching button."));
+        //Serial.println(F("Attaching button."));
 
         pinButton = p_pin_button;
         debounceDelay = p_debounce_delay;
@@ -21,7 +21,7 @@ void ButtonState::attach(int p_pin_button, int p_debounce_delay) {
 
         initialized = true;
     } else {
-        Serial.println(F("Button already attached."));
+        //Serial.println(F("Button already attached."));
     }
 }
 
@@ -34,23 +34,23 @@ void ButtonState::processState() {
             userAction = ButtonAction::Press;
         } else if (newState == HIGH && state == HIGH) {
             userAction = ButtonAction::Hold;
-            cyclesHeld += 1;
+            //cyclesHeld += 1;
         } else if (newState == LOW && state == HIGH) {
             userAction = ButtonAction::Release;
-            cyclesHeld = 0;
+            //cyclesHeld = 0;
         } else if (newState == LOW && state == LOW) {
             userAction = ButtonAction::Rest;
         }
 
         state = newState;
     } else {
-        Serial.println(F("Button not initialized."));
+        //Serial.println(F("Button not initialized."));
     }
 }
 
-int ButtonState::getState() {return state;}
+/*int ButtonState::getState() {return state;}
 int ButtonState::getCyclesHeld() {return cyclesHeld;}
-unsigned long ButtonState::getLastReading() {return lastReading;}
+unsigned long ButtonState::getLastReading() {return lastReading;}*/
 ButtonAction ButtonState::getUserAction() {return userAction;}
 bool ButtonState::debounced() {return (lastReading + debounceDelay <= millis());}
 /*

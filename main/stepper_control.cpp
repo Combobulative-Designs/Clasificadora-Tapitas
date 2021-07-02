@@ -1,5 +1,4 @@
 #include <AccelStepper.h>
-#include <MultiStepper.h>
 
 #include <Arduino.h>
 
@@ -21,14 +20,14 @@ StepperActions StepperControl::getCurrentAction() {return currentAction;}
 
 void StepperControl::initialize() {
     if (!initialized) {
-        Serial.println(F("Initializing stepper motor."));
+        //Serial.println(F("Initializing stepper motor."));
 
         stepper.setCurrentPosition(0);
-        stepper.setMaxSpeed(speed);
+        stepper.setMaxSpeed(500);
 
         initialized = true;
     } else {
-        Serial.println(F("Stepper motor already initialized."));
+        //Serial.println(F("Stepper motor already initialized."));
     }
 }
 
@@ -44,12 +43,12 @@ void StepperControl::processState() {
                 break;
             case StepperActions::CapStep:
                 if (actionChange) {
-                    Serial.println(F("Moving stepper motor one cap step."));
+                    //Serial.println(F("Moving stepper motor one cap step."));
                     actionChange = false;
                     nextPosition = positionCounter + 1;
-                    if (nextPosition >= positions) { nextPosition = 0; }
+                    if (nextPosition >= 12) { nextPosition = 0; }
                     stepper.enableOutputs();
-                    stepper.setSpeed(speed);
+                    stepper.setSpeed(500);
                     stepper.moveTo(positionSteps[nextPosition]);
                 }
                 if (stepper.currentPosition() == stepper.targetPosition()) {
@@ -57,35 +56,35 @@ void StepperControl::processState() {
                     actionChange = true;
                     currentAction = StepperActions::Stopping;
                 } else {
-                    stepper.setSpeed(speed);
+                    stepper.setSpeed(500);
                     stepper.runSpeed();
                 }
                 break;
             case StepperActions::Cycling:
                 if (actionChange) {
-                    Serial.println(F("Cycling stepper motor."));
+                    //Serial.println(F("Cycling stepper motor."));
                     actionChange = false;
                     nextPosition = positionCounter + 1;
-                    if (nextPosition >= positions) { nextPosition = 0; }
+                    if (nextPosition >= 12) { nextPosition = 0; }
                     stepper.enableOutputs();
-                    stepper.setSpeed(speed);
+                    stepper.setSpeed(500);
                     stepper.moveTo(positionSteps[nextPosition]);
                 }
                 if (stepper.currentPosition() == stepper.targetPosition()) {
                     positionCounter = nextPosition;
                     nextPosition = positionCounter + 1;
-                    if (nextPosition >= positions) { nextPosition = 0; }
+                    if (nextPosition >= 12) { nextPosition = 0; }
                     stepper.moveTo(positionSteps[nextPosition]);
-                    stepper.setSpeed(speed);
+                    stepper.setSpeed(500);
                     stepper.runSpeed();
                 } else {
-                    stepper.setSpeed(speed);
+                    stepper.setSpeed(500);
                     stepper.runSpeed();
                 }
                 break;
             case StepperActions::Stopping:
                 if (actionChange) {
-                    Serial.println(F("Stopping stepper motor."));
+                    //Serial.println(F("Stopping stepper motor."));
                     actionChange = false;
                     stepper.disableOutputs();
                     if (previousAction == StepperActions::Cycling) {
@@ -109,7 +108,7 @@ void StepperControl::doCycling() {
             currentAction = StepperActions::Cycling;
         }
     } else {
-        Serial.println(F("Stepper motor not initialized."));
+        //Serial.println(F("Stepper motor not initialized."));
     }
 }
 
@@ -120,7 +119,7 @@ void StepperControl::doCapStep() {
             currentAction = StepperActions::CapStep;
         }
     } else {
-        Serial.println(F("Stepper motor not initialized."));
+        //Serial.println(F("Stepper motor not initialized."));
     }
 }
 void StepperControl::stopActions() {
@@ -130,6 +129,6 @@ void StepperControl::stopActions() {
             currentAction = StepperActions::Stopping;
         }
     } else {
-        Serial.println(F("Stepper motor not initialized."));
+        //Serial.println(F("Stepper motor not initialized."));
     }
 }

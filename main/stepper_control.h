@@ -1,5 +1,4 @@
 #include <AccelStepper.h>
-#include <MultiStepper.h>
 
 #include "common_stuff.h"
 
@@ -35,9 +34,9 @@ private:
     enum StepperActions currentAction;
     enum StepperActions previousAction;
 
-    const int speed = 500;
-    const int totalSteps = 4096;
-    const int positions = 12;
+    //const int speed = 500;
+    //const int totalSteps = 4096;
+    //const int positions = 12;
     const int positionSteps[12] = {
             0,
             341,

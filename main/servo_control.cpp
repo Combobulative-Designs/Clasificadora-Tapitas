@@ -9,19 +9,19 @@ ServoControl::ServoControl(int p_pin_servo_signal) : rotation_black(0), initiali
 
 void ServoControl::initialize() {
     if (!initialized) {
-        Serial.println(F("Initializing servo motor."));
+        //Serial.println(F("Initializing servo motor."));
         
         servo_obj.attach(pinSignal, 500, 2500);
         servo_obj.write(rotation_black);
         initialized = true;
     } else {
-        Serial.println(F("Servo motor already initialized."));
+        //Serial.println(F("Servo motor already initialized."));
     }
 }
 
 void ServoControl::moveToColor(ColorCategory p_category) {
     if (initialized) {
-        Serial.println(F("Moving servo."));
+        //Serial.println(F("Moving servo."));
         int rotation;
         switch (p_category) {
             case ColorCategory::Reds:
@@ -47,6 +47,6 @@ void ServoControl::moveToColor(ColorCategory p_category) {
         }
         servo_obj.write(rotation);
     } else {
-        Serial.println(F("Servo motor not initialized."));
+        //Serial.println(F("Servo motor not initialized."));
     }
 }

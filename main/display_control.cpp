@@ -1,12 +1,12 @@
 #include <Arduino.h>
 #include <LiquidCrystal_I2C.h>
-#include "PString.h"
+//#include "PString.h"
 
 #include "common_stuff.h"
 
 #include "display_control.h"
 
-byte arrow_right[8] = {
+const byte arrow_right[8] = {
         B10000,
         B11000,
         B11100,
@@ -16,7 +16,7 @@ byte arrow_right[8] = {
         B10000,
         B00000
 };
-byte arrow_left[8] = {
+const byte arrow_left[8] = {
         B00010,
         B00110,
         B01110,
@@ -26,7 +26,7 @@ byte arrow_left[8] = {
         B00010,
         B00000
 };
-byte arrow_return[8] = {
+const byte arrow_return[8] = {
         B00000,
         B01000,
         B11100,
@@ -50,76 +50,61 @@ DisplayControl::DisplayControl(byte p_address, int p_columns, int p_rows, int p_
         backlightState(false)
 {}
 TextLine::TextLine() :
-        alignment(TextAlignment::Left),
-        lineProcessor(lineBuffer, sizeof(lineBuffer))
+        alignment(TextAlignment::Left)
 {}
 
 void DisplayControl::initialize() {
     if (!initialized) {
-        Serial.println(F("Initializing display.."));
         i2c_display.init();
         i2c_display.backlight();
         i2c_display.print(F("Initializing..."));
         i2c_display.noCursor();
         backlightState = true;
         initialized = true;
-        i2c_display.createChar(1, arrow_left);
-        i2c_display.createChar(2, arrow_right);
-        i2c_display.createChar(3, arrow_return);
-    } else {
-        Serial.println(F("Display already initialized."));
-    }
-}
-
-int TextLine::getTotalCycles() {
-    if (strlen(completeLine) > 16) {
-        return marqueeDelayAfter + marqueeDelayBefore + ((strlen(completeLine) - 15) * marqueeSpeed);
-    } else {
-        return 0;
+        i2c_display.createChar(1, (uint8_t*)arrow_left);
+        i2c_display.createChar(2, (uint8_t*)arrow_right);
+        i2c_display.createChar(3, (uint8_t*)arrow_return);
     }
 }
 
 void TextLine::generateVisibleLine(int p_columns) {
-    lineProcessor.begin();
     if (strlen(completeLine) == p_columns) {
-        lineProcessor.print(completeLine);
+        for (int i = 0; i < strlen(completeLine); i++) visibleLine[i] = completeLine[i];
+        visibleLine[16] = '\0';
     } else if (strlen(completeLine) < p_columns) {
         if (alignment == TextAlignment::Left) {
-            lineProcessor.print(completeLine);
-            while (lineProcessor.length() < 16) lineProcessor.print(" ");
+            for (int i = 0; i < strlen(completeLine); i++) visibleLine[i] = completeLine[i];
+            for (int i = strlen(completeLine); i < 16; i++) visibleLine[i] = ' ';
+            visibleLine[16] = '\0';
         }
         if (alignment == TextAlignment::Right) {
-            while (lineProcessor.length() < (16 - strlen(completeLine))) lineProcessor.print(" ");
-            lineProcessor.print(completeLine);
+            for (int i = 0; i < (16 - strlen(completeLine)); i++) visibleLine[i] = ' ';
+            for (int i = 0; i < strlen(completeLine); i++) visibleLine[i + strlen(completeLine)] = completeLine[i];
+            visibleLine[16] = '\0';
         }
         if (alignment == TextAlignment::Center) {
-            while (lineProcessor.length() < (int)((16 - strlen(completeLine)) / 2)) lineProcessor.print(" ");
-            lineProcessor.print(completeLine);
-            while (lineProcessor.length() < 16) lineProcessor.print(" ");
+            for (int i = 0; i < (int)((16 - strlen(completeLine)) / 2); i++) visibleLine[i] = ' ';
+            for (int i = 0; i < strlen(completeLine); i++) visibleLine[i + (int)((16 - strlen(completeLine)) / 2)] = completeLine[i];
+            for (int i = 0; i < ((int)((16 - strlen(completeLine)) / 2) + strlen(completeLine)); i++) visibleLine[i + ((int)((16 - strlen(completeLine)) / 2) + strlen(completeLine))] = ' ';
+            visibleLine[16] = '\0';
         }
     }
-
-    for (int i = 0; i < 16; i++) {
-        visibleLine[i] = lineProcessor[i];
-    }
-    visibleLine[16] = '\0';
 }
 
 void DisplayControl::processState() {
-    if (backlightState and rested()) {i2c_display.noBacklight(); backlightState = false; }
-    else if ((!backlightState) and (!rested())) {i2c_display.backlight(); backlightState = true; }
+    /*if (backlightState and rested()) {i2c_display.noBacklight(); backlightState = false; }
+    else if ((!backlightState) and (!rested())) {i2c_display.backlight(); backlightState = true; }*/
 
     for (int row=0; row<rows; ++row) {
-        if (lines[row].completeLine != lines[row].oldCompleteLine) {
+        if (stateChanged) {
             for (int i = 0; i < 30; i++) lines[row].oldCompleteLine[i] = lines[row].completeLine[i];
             lines[row].generateVisibleLine(columns);
             for (int i = 0; i < 17; i++) lines[row].oldVisibleLine[i] = lines[row].visibleLine[i];
-            stateChanged = true;
+            //stateChanged = true;
         }
     }
 
     if (stateChanged) {
-        stateChanged = false;
         lastWrite = millis();
         i2c_display.setCursor(0, 0);
         i2c_display.print(lines[0].visibleLine);
@@ -130,12 +115,14 @@ void DisplayControl::processState() {
             i2c_display.setCursor(0, 1);
             i2c_display.write(byte(1));
             i2c_display.setCursor(15, 1);
-            i2c_display.write(byte(0));
+            i2c_display.write(byte(2));
         }
+        stateChanged = false;
     }
 }
 
 void DisplayControl::setLineText(char p_text[], int p_lineIndex, enum TextAlignment p_alignment) {
+    stateChanged = true;
     for (int i = 0; i < strlen(p_text); i++) lines[p_lineIndex].completeLine[i] = p_text[i];
     lines[p_lineIndex].completeLine[strlen(p_text)] = '\0' ;
     for (int i = strlen(lines[p_lineIndex].completeLine) + 1; i < 30; i++) lines[p_lineIndex].completeLine[i] = 0;

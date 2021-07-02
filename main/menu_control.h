@@ -13,7 +13,7 @@ struct MenuItemS {
     const int action;
 };
 
-class MenuItem {
+/*class MenuItem {
 public:
     MenuItem();
     MenuItem(int, int, int, const char [20], int);
@@ -36,11 +36,11 @@ private:
     const int siblingIndex;
     const int action;
     const char text[20];
-};
+};*/
 
 class MenuControl {
 public:
-    MenuControl(const MenuItem (&)[36], DisplayControl (&));
+    MenuControl(const MenuItemS (&)[36], DisplayControl (&));
 
     void processState();
     void initialize();
@@ -48,7 +48,12 @@ public:
 
     enum MenuActions getCurrentAction();
     int getCurrentMenuItemId();
-    MenuItem getMenuItem(int p_id);
+    MenuItemS getMenuItem(int p_id);
+
+    int getNextSiblingId();
+    int getPrevSiblingId();
+    int getSiblingCount();
+    int getFirstChild();
 
     bool locked();
     bool rested();
@@ -58,7 +63,7 @@ public:
     void setLock(int p_duration);
 
 private:
-    const MenuItem (&menu)[36];
+    const MenuItemS (&menu)[36];
     enum MenuActions currentAction;
     int currentMenuItemId;
     bool initialized;

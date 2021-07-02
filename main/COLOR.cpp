@@ -3,7 +3,7 @@
 #include "Adafruit_TCS34725.h"
 #include "ColorConverterLib.h"
 
-Adafruit_TCS34725 colorSensor = Adafruit_TCS34725( TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_1X );
+Adafruit_TCS34725 colorSensor = Adafruit_TCS34725( TCS34725_INTEGRATIONTIME_700MS, TCS34725_GAIN_1X );
 
 const int COLOR_HUE[] = { MAX_HUE_ROJO, MAX_HUE_NARANJA, MAX_HUE_AMARILLO, MAX_HUE_VERDE, MAX_HUE_AZUL };
 const int COLOR_ARRAY_LENGTH = sizeof (COLOR_HUE ) / sizeof (int );
