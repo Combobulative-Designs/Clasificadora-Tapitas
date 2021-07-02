@@ -33,7 +33,7 @@
 */
 enum ColorCategory categoryDetected = ColorCategory::Blacks;
 
-const MenuItemS PROGMEM menu_01 = {1, 0, 0, "TAPINATOR 9KPP\0\0\0", 17};
+const MenuItemS PROGMEM menu_01 = {1, 0, 0, "TAPINATOR 9KPP\0\0\0\0\0", 17};
 const MenuItemS PROGMEM menu_02 = {2, 1, 0, "Iniciar Ya\0\0\0\0\0\0\0\0\0", 0};
 const MenuItemS PROGMEM menu_03 = {3, 1, 1, "Clasificar\0\0\0\0\0\0\0\0\0", 18};
 const MenuItemS PROGMEM menu_04 = {4, 1, 2, "Configurar\0\0\0\0\0\0\0\0\0", 18};
