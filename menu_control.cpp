@@ -9,31 +9,29 @@ MenuItem::MenuItem() :
         id(0),
         parentId(0),
         siblingIndex(0),
-        action(MenuActions::None)
-{
-    for (int i = 0; i < 17; i++) {
-        text[i] = ' ';
-    }
-    text[16] = (char)0;
-}
-MenuItem::MenuItem(int p_id, int p_parent_id, int p_sibling_index, char p_text[17], enum MenuActions p_action) :
+        action(17),
+        text{0}
+{}
+MenuItem::MenuItem(int p_id, int p_parent_id, int p_sibling_index, const char p_text[20], int p_action) :
         id(p_id),
         parentId(p_parent_id),
         siblingIndex(p_sibling_index),
-        action(p_action)
-{
-    for (int i = 0; i < 17; i++) {
-        text[i] = p_text[i];
-    }
+        action(p_action),
+        text{0}
+{}
+
+int MenuItem::getId() const {return id;}
+int MenuItem::getParentId() const {return parentId;}
+int MenuItem::getSiblingIndex() const {return siblingIndex;}
+enum MenuActions MenuItem::getAction() const {return (enum MenuActions)action;}
+char * MenuItem::getText() const {
+  char * returnValue;
+  for (int i = 0; strlen(text); i++) returnValue[i] = text[i];
+  returnValue[strlen(text)] = 0;
+  return returnValue;
 }
 
-int MenuItem::getId() {return id;}
-int MenuItem::getParentId() {return parentId;}
-int MenuItem::getSiblingIndex() {return siblingIndex;}
-char * MenuItem::getText() {return text;}
-enum MenuActions MenuItem::getAction() {return action;}
-
-int MenuItem::getSiblingCount(MenuItem p_menu[]) {
+int MenuItem::getSiblingCount(const MenuItem (&p_menu)[36]) const {
     int nodeCounter = 0;
     for (int i = 0; i < 36; i++) {
         if (p_menu[i].getParentId() == parentId) nodeCounter++;
@@ -41,14 +39,14 @@ int MenuItem::getSiblingCount(MenuItem p_menu[]) {
     return nodeCounter;
 }
 
-int MenuItem::getFirstChild(MenuItem p_menu[]) {
+int MenuItem::getFirstChild(const MenuItem (&p_menu)[36]) const {
     for (int i = 0; i < 36; i++) {
         if (p_menu[i].getParentId() == id and p_menu[i].getSiblingIndex() == 0) return p_menu[i].getId();
     }
     return 0;
 }
 
-int MenuItem::getNextSiblingId(MenuItem p_menu[]) {
+int MenuItem::getNextSiblingId(const MenuItem (&p_menu)[36]) const {
     int siblingIndexTarget;
     if (siblingIndex == getSiblingCount(p_menu) - 1) {
         siblingIndexTarget = 0;
@@ -61,7 +59,7 @@ int MenuItem::getNextSiblingId(MenuItem p_menu[]) {
     return id;
 }
 
-int MenuItem::getPrevSiblingId(MenuItem p_menu[]) {
+int MenuItem::getPrevSiblingId(const MenuItem (&p_menu)[36]) const {
     int siblingIndexTarget;
     if (siblingIndex == 0) {
         siblingIndexTarget = getSiblingCount(p_menu) - 1;
@@ -76,19 +74,15 @@ int MenuItem::getPrevSiblingId(MenuItem p_menu[]) {
 
 
 
-MenuControl::MenuControl(MenuItem p_menu[36], DisplayControl &p_displayControl) {
-    currentAction = MenuActions::None;
-    initialized = false;
-    stateChanged = false;
-    lockDuration = 0;
-    inactivityTimer = 15000;
-    restDelay = 50;
-    displayControl = p_displayControl;
-
-    for (int i = 0; i < 36; i++) {
-        menu[i] = p_menu[i];
-    }
-}
+MenuControl::MenuControl(const MenuItem (&p_menu)[36], DisplayControl &p_displayControl) :
+    initialized(false),
+    stateChanged(false),
+    lockDuration(0),
+    inactivityTimer(15000),
+    restDelay(50),
+    displayControl(p_displayControl),
+    menu(p_menu)
+{}
 
 void MenuControl::initialize() {
     if (!initialized) {
@@ -179,13 +173,13 @@ void MenuControl::processState() {
             switch (currentAction) {
                 case MenuActions::RunAuto:
                     displayControl.noNavArrows();
-                    displayControl.setLineText("Clasificando", 0, TextAlignment::Center);
-                    displayControl.setLineText("**", 0, TextAlignment::Center);
+                    displayControl.setLineText((char*)F("Clasificando"), 0, TextAlignment::Center);
+                    displayControl.setLineText((char*)F("**"), 0, TextAlignment::Center);
                     break;
                 case MenuActions::RunStep:
                     displayControl.noNavArrows();
-                    displayControl.setLineText("Un paso...", 0, TextAlignment::Center);
-                    displayControl.setLineText("**", 0, TextAlignment::Center);
+                    displayControl.setLineText((char*)F("Un paso..."), 0, TextAlignment::Center);
+                    displayControl.setLineText((char*)F("**"), 0, TextAlignment::Center);
                     break;
                 case MenuActions::DoSensorReading:
                     break;
@@ -199,7 +193,7 @@ void MenuControl::processState() {
                     break;
                 case MenuActions::ShowTime:
                     displayControl.noNavArrows();
-                    displayControl.setLineText("Tiempo total:", 0, TextAlignment::Center);
+                    displayControl.setLineText((char *)F("Tiempo total:"), 0, TextAlignment::Center);
                     displayControl.setLineText((char *)(millis() / 1000), 0, TextAlignment::Center);
                     break;
                 case MenuActions::ShowAmountTotal:
@@ -229,4 +223,3 @@ void MenuControl::processState() {
         Serial.println(F("Menu not initialized."));
     }
 }
-

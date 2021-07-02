@@ -99,7 +99,10 @@ void TextLine::generateVisibleLine(int p_columns) {
         }
     }
 
-    visibleLine = lineProcessor;
+    for (int i = 0; i < 16; i++) {
+        visibleLine[i] = lineProcessor[i];
+    }
+    visibleLine[16] = '\0';
 }
 
 void DisplayControl::processState() {
@@ -108,9 +111,9 @@ void DisplayControl::processState() {
 
     for (int row=0; row<rows; ++row) {
         if (lines[row].completeLine != lines[row].oldCompleteLine) {
-            lines[row].oldCompleteLine = lines[row].completeLine;
+            for (int i = 0; i < 30; i++) lines[row].oldCompleteLine[i] = lines[row].completeLine[i];
             lines[row].generateVisibleLine(columns);
-            lines[row].oldVisibleLine = lines[row].visibleLine;
+            for (int i = 0; i < 17; i++) lines[row].oldVisibleLine[i] = lines[row].visibleLine[i];
             stateChanged = true;
         }
     }
@@ -133,7 +136,9 @@ void DisplayControl::processState() {
 }
 
 void DisplayControl::setLineText(char p_text[], int p_lineIndex, enum TextAlignment p_alignment) {
-    lines[p_lineIndex].completeLine = p_text;
+    for (int i = 0; i < strlen(p_text); i++) lines[p_lineIndex].completeLine[i] = p_text[i];
+    lines[p_lineIndex].completeLine[strlen(p_text)] = '\0' ;
+    for (int i = strlen(lines[p_lineIndex].completeLine) + 1; i < 30; i++) lines[p_lineIndex].completeLine[i] = 0;
     lines[p_lineIndex].alignment = p_alignment;
 }
 

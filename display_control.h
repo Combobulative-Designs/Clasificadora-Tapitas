@@ -13,11 +13,11 @@ public:
     int getTotalCycles();
     void generateVisibleLine(int p_columns);
 
-    char* completeLine = " ";
-    char* visibleLine = " ";
-    char* oldCompleteLine = " ";
-    char* oldVisibleLine = " ";
-    char lineBuffer[30];
+    char completeLine[30] = {0};
+    char visibleLine[17] = {0};
+    char oldCompleteLine[30] = {0};
+    char oldVisibleLine[17] = {0};
+    char lineBuffer[22];
     PString lineProcessor;
     int marqueeDelayBefore = 0;
     int marqueeDelayAfter = 0;

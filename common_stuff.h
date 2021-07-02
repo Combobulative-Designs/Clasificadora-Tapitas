@@ -12,11 +12,24 @@ enum class ColorCategory {
     Blacks
 };
 enum class MenuActions {
-    RunAuto, RunStep, DoSensorReading, DoServoTurn,
-    DoStepperCapStep, DoStepperCWCycling, DoStepperCCWCycling,
-    ShowTime, ShowAmountTotal, ShowAmountReds, ShowAmountBlues,
-    ShowAmountGreens, ShowAmountYellows, ShowAmountBlacks,
-    ShowAmountWhites, ShowAmountGreys, NavigateToId, None
+    RunAuto, 
+    RunStep, 
+    DoSensorReading, 
+    DoServoTurn,
+    DoStepperCapStep, 
+    DoStepperCWCycling, 
+    DoStepperCCWCycling,
+    ShowTime, 
+    ShowAmountTotal, 
+    ShowAmountReds, 
+    ShowAmountBlues,
+    ShowAmountGreens, 
+    ShowAmountYellows, 
+    ShowAmountBlacks,
+    ShowAmountWhites, 
+    ShowAmountGreys, 
+    NavigateToId, 
+    None
 };
 
 class ButtonState {
@@ -43,7 +56,7 @@ private:
     int debounceDelay;
 };
 
-int I2CScanner(byte addrs[]);
+//int I2CScanner(byte addrs[]);
 char* ConvertColorCategoryToChar(ColorCategory category);
 
 #endif //CLASIFICADORA_COMMON_STUFF_H

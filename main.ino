@@ -10,11 +10,6 @@
 #include "display_control.h"
 #include "menu_control.h"
 
-/*#define PIN_STEPPER_BUTTON 2
-#define PIN_SERVO_BUTTON 3
-#define PIN_SENSOR_BUTTON 4
-#define PIN_PANIC_BUTTON 5*/
-
 #define PIN_BUTTON_PREV 2
 #define PIN_BUTTON_NEXT 3
 #define PIN_BUTTON_RETURN 4
@@ -38,55 +33,52 @@
 
 enum ColorCategory categoryDetected = ColorCategory::Blacks;
 
-const MenuItem menu[36] = {
-        MenuItem(1, 0, 0, "TAPITANATOR 9KPP", MenuActions::None),
-        MenuItem(2, 1, 0, "Iniciar Ya", MenuActions::RunAuto),
-        MenuItem(3, 1, 1, "Clasificar", MenuActions::NavigateToId),
-        MenuItem(4, 1, 2, "Configurar", MenuActions::NavigateToId),
-        MenuItem(5, 1, 3, "Estadistica", MenuActions::NavigateToId),
-        MenuItem(6, 3, 0, "Automatico", MenuActions::NavigateToId),
-        MenuItem(7, 6, 0, "Comenzar", MenuActions::RunAuto),
-        MenuItem(8, 4, 0, "Calib. disco", MenuActions::NavigateToId),
-        MenuItem(9, 8, 0, "A reloj", MenuActions::DoStepperCWCycling),
-        MenuItem(10, 8, 1, "Contra reloj", MenuActions::DoStepperCCWCycling),
-        MenuItem(11, 4, 0, "Acerca de", MenuActions::NavigateToId),
-        MenuItem(12, 11, 0, "Equipo", MenuActions::NavigateToId),
-        MenuItem(13, 12, 0, "Vogel J.", MenuActions::None),
-        MenuItem(14, 12, 1, "Ponce.. E.", MenuActions::None),
-        MenuItem(15, 12, 2, "Jorajuria S.", MenuActions::None),
-        MenuItem(16, 12, 3, "Jauregui R.", MenuActions::None),
-        MenuItem(17, 11, 1, "Clase", MenuActions::NavigateToId),
-        MenuItem(18, 17, 0, "U. Catolica", MenuActions::None),
-        MenuItem(19, 17, 1, "2021 Sem 1", MenuActions::None),
-        MenuItem(20, 17, 2, "TI3 Grupo B", MenuActions::None),
-        MenuItem(21, 17, 3, "Equipo 12", MenuActions::None),
-        MenuItem(22, 3, 1, "Manual", MenuActions::NavigateToId),
-        MenuItem(23, 22, 0, "Mover disco", MenuActions::DoStepperCapStep),
-        MenuItem(24, 22, 1, "Leer color", MenuActions::DoSensorReading),
-        MenuItem(25, 22, 2, "Mover sensor", MenuActions::DoServoTurn),
-        MenuItem(26, 3, 2, "Paso a paso", MenuActions::NavigateToId),
-        MenuItem(27, 26, 0, "Siguiente", MenuActions::RunStep),
-        MenuItem(28, 5, 0, "Tiempo", MenuActions::ShowTime),
-        MenuItem(29, 5, 1, "Cantidades", MenuActions::NavigateToId),
-        MenuItem(30, 29, 0, "Rojos", MenuActions::ShowAmountReds),
-        MenuItem(31, 29, 1, "Azules", MenuActions::ShowAmountBlues),
-        MenuItem(32, 29, 2, "Verdes", MenuActions::ShowAmountGreens),
-        MenuItem(33, 29, 3, "Amarillos", MenuActions::ShowAmountYellows),
-        MenuItem(34, 29, 4, "Blancos", MenuActions::ShowAmountWhites),
-        MenuItem(35, 29, 5, "Grises", MenuActions::ShowAmountGreys),
-        MenuItem(36, 29, 6, "Negros", MenuActions::ShowAmountBlacks)
+const MenuItemS PROGMEM menu_01 = {1, 0, 0, "TAPITANATOR 9KPP\0\0\0", 17};
+const MenuItemS PROGMEM menu_02 = {2, 1, 0, "Iniciar Ya\0\0\0\0\0\0\0\0\0", 0};
+const MenuItemS PROGMEM menu_03 = {3, 1, 1, "Clasificar\0\0\0\0\0\0\0\0\0", 16};
+const MenuItemS PROGMEM menu_04 = {4, 1, 2, "Configurar\0\0\0\0\0\0\0\0\0", 16};
+const MenuItemS PROGMEM menu_05 = {5, 1, 3, "Estadistica\0\0\0\0\0\0\0\0", 16};
+const MenuItemS PROGMEM menu_06 = {6, 3, 0, "Automatico\0\0\0\0\0\0\0\0\0", 16};
+const MenuItemS PROGMEM menu_07 = {7, 6, 0, "Comenzar\0\0\0\0\0\0\0\0\0\0\0", 0};
+const MenuItemS PROGMEM menu_08 = {8, 4, 0, "Calib. disco\0\0\0\0\0\0\0", 16};
+const MenuItemS PROGMEM menu_09 = {9, 8, 0, "A reloj\0\0\0\0\0\0\0\0\0\0\0\0", 5};
+const MenuItemS PROGMEM menu_10 = {10, 8, 1, "Contra reloj\0\0\0\0\0\0\0", 6};
+const MenuItemS PROGMEM menu_11 = {11, 4, 0, "Acerca de\0\0\0\0\0\0\0\0\0\0", 16};
+const MenuItemS PROGMEM menu_12 = {12, 11, 0, "Equipo\0\0\0\0\0\0\0\0\0\0\0\0\0", 16};
+const MenuItemS PROGMEM menu_13 = {13, 12, 0, "Vogel J.\0\0\0\0\0\0\0\0\0\0\0", 17};
+const MenuItemS PROGMEM menu_14 = {14, 12, 1, "Ponce.. E.\0\0\0\0\0\0\0\0\0", 17};
+const MenuItemS PROGMEM menu_15 = {15, 12, 2, "Jorajuria S.\0\0\0\0\0\0\0", 17};
+const MenuItemS PROGMEM menu_16 = {16, 12, 3, "Jauregui R.\0\0\0\0\0\0\0\0", 17};
+const MenuItemS PROGMEM menu_17 = {17, 11, 1, "Clase\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 16};
+const MenuItemS PROGMEM menu_18 = {18, 17, 0, "U. Catolica\0\0\0\0\0\0\0\0", 17};
+const MenuItemS PROGMEM menu_19 = {19, 17, 1, "2021 Sem 1\0\0\0\0\0\0\0\0\0", 17};
+const MenuItemS PROGMEM menu_20 = {20, 17, 2, "TI3 Grupo B\0\0\0\0\0\0\0\0", 17};
+const MenuItemS PROGMEM menu_21 = {21, 17, 3, "Equipo 12\0\0\0\0\0\0\0\0\0\0", 17};
+const MenuItemS PROGMEM menu_22 = {22, 3, 1, "Manual\0\0\0\0\0\0\0\0\0\0\0\0\0", 16};
+const MenuItemS PROGMEM menu_23 = {23, 22, 0, "Mover disco\0\0\0\0\0\0\0\0", 4};
+const MenuItemS PROGMEM menu_24 = {24, 22, 1, "Leer color\0\0\0\0\0\0\0\0\0", 2};
+const MenuItemS PROGMEM menu_25 = {25, 22, 2, "Mover sensor\0\0\0\0\0\0\0", 3};
+const MenuItemS PROGMEM menu_26 = {26, 3, 2, "Paso a paso\0\0\0\0\0\0\0\0", 16};
+const MenuItemS PROGMEM menu_27 = {27, 26, 0, "Siguiente\0\0\0\0\0\0\0\0\0\0", 1};
+const MenuItemS PROGMEM menu_28 = {28, 5, 0, "Tiempo\0\0\0\0\0\0\0\0\0\0\0\0\0", 7};
+const MenuItemS PROGMEM menu_29 = {29, 5, 1, "Cantidades\0\0\0\0\0\0\0\0\0", 16};
+const MenuItemS PROGMEM menu_30 = {30, 29, 0, "Rojos\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 9};
+const MenuItemS PROGMEM menu_31 = {31, 29, 1, "Azules\0\0\0\0\0\0\0\0\0\0\0\0\0", 10};
+const MenuItemS PROGMEM menu_32 = {32, 29, 2, "Verdes\0\0\0\0\0\0\0\0\0\0\0\0\0", 11};
+const MenuItemS PROGMEM menu_33 = {33, 29, 3, "Amarillos\0\0\0\0\0\0\0\0\0\0", 12};
+const MenuItemS PROGMEM menu_34 = {34, 29, 4, "Blancos\0\0\0\0\0\0\0\0\0\0\0\0", 14};
+const MenuItemS PROGMEM menu_35 = {35, 29, 5, "Grises\0\0\0\0\0\0\0\0\0\0\0\0\0", 15};
+const MenuItemS PROGMEM menu_36 = {36, 29, 6, "Negros\0\0\0\0\0\0\0\0\0\0\0\0\0", 13};
 
-
+const MenuItemS menu[36] PROGMEM = {
+  menu_01, menu_02, menu_03, menu_04, menu_05, menu_06, menu_07, menu_08, menu_09, menu_10,
+  menu_11, menu_12, menu_13, menu_14, menu_15, menu_16, menu_17, menu_18, menu_19, menu_20,
+  menu_21, menu_22, menu_23, menu_24, menu_25, menu_26, menu_27, menu_28, menu_29, menu_30,
+  menu_31, menu_32, menu_33, menu_34, menu_35, menu_36
 };
 
-// Codigo para pruebas con operacion por boton:
-/*ButtonState sensorButton;
-ButtonState servoButton;
-ButtonState stepperButton;
-ButtonState panicButton;*/
+const MenuItem menu2[36];
 
-
-// Codigo para operacion por menu
 ButtonState buttonPrev;
 ButtonState buttonNext;
 ButtonState buttonReturn;
@@ -96,16 +88,11 @@ ButtonState buttonEnter;
 //StepperControl stepperControl(PIN_STEPPER_IN1, PIN_STEPPER_IN2, PIN_STEPPER_IN3, PIN_STEPPER_IN4);
 //ServoControl servoControl(PIN_SERVO_SIGNAL);
 DisplayControl displayControl(0x27, 16, 2, REST_DELAY);
-MenuControl menuControl(menu, displayControl);
+MenuControl menuControl(menu2, displayControl);
 
 
 void setup() {
     Serial.begin(9600);
-
-    /*sensorButton.attach(PIN_SENSOR_BUTTON, DEBOUNCE_DELAY);
-    servoButton.attach(PIN_SERVO_BUTTON, DEBOUNCE_DELAY);
-    stepperButton.attach(PIN_STEPPER_BUTTON, DEBOUNCE_DELAY);
-    panicButton.attach(PIN_PANIC_BUTTON, DEBOUNCE_DELAY);*/
 
     buttonPrev.attach(PIN_BUTTON_PREV, DEBOUNCE_DELAY);
     buttonNext.attach(PIN_BUTTON_NEXT, DEBOUNCE_DELAY);
@@ -124,11 +111,11 @@ void setup() {
 
     displayControl.noNavArrows();
     displayControl.setLineText(
-            "TAPITANATOR 9KPP",
+            (char*)"TAPITANATOR 9KPP",
             0,
             TextAlignment::Center);
     displayControl.setLineText(
-            "¡Bienvenido!",
+            (char*)"¡Bienvenido!",
             1,
             TextAlignment::Center);
 
@@ -138,16 +125,6 @@ void setup() {
 }
 
 void loop() {
-    /*ProcessServoButton();
-    ProcessStepperButton();
-    ProcessSensorButton();
-    ProcessPanicButton();*/
-
-    /*ProcessButtonsState();
-    ProcessMenuState();
-    ProcessDisplayState();*/
-
-
     buttonPrev.processState();
     buttonNext.processState();
     buttonReturn.processState();
@@ -158,91 +135,6 @@ void loop() {
     if (buttonReturn.getUserAction() == ButtonAction::Release) menuControl.triggerUserAction(MenuUserActions::Next);
     if (buttonEnter.getUserAction() == ButtonAction::Release) menuControl.triggerUserAction(MenuUserActions::Next);
 
-
     menuControl.processState();
-
     displayControl.processState();
 }
-
-/*void ProcessButtonsState() {
-    buttonPrev.processState();
-    buttonNext.processState();
-    buttonReturn.processState();
-    buttonEnter.processState();
-
-    if (buttonPrev.getUserAction() == ButtonAction::Release) menuControl.triggerUserAction(MenuUserActions::Next);
-    if (buttonNext.getUserAction() == ButtonAction::Release) menuControl.triggerUserAction(MenuUserActions::Next);
-    if (buttonReturn.getUserAction() == ButtonAction::Release) menuControl.triggerUserAction(MenuUserActions::Next);
-    if (buttonEnter.getUserAction() == ButtonAction::Release) menuControl.triggerUserAction(MenuUserActions::Next);
-}
-
-void ProcessMenuState() {
-    menuControl.processState();
-}
-
-void ProcessDisplayState() {
-    if (displayControl.rested()) {
-        displayControl.processState();
-    }
-}*/
-
-
-
-
-
-
-
-
-
-/*
-void ProcessServoButton() {
-    servoButton.processState();
-
-    if (servoButton.getUserAction() == ButtonAction::Release) {
-        servoControl.moveToColor(categoryDetected);
-    }
-}
-
-void ProcessStepperButton() {
-    stepperButton.processState();
-
-    if (stepperButton.getUserAction() == ButtonAction::Hold) {
-        if (stepperButton.getSecondsHeld() >= 3 and stepperControl.getCurrentAction() == StepperActions::Resting) {
-            stepperControl.doCycling();
-            //encoderControl.resetRotation();
-        }
-    } else if (stepperButton.getUserAction() == ButtonAction::Release) {
-        if (stepperControl.getCurrentAction() == StepperActions::Resting) {
-            stepperControl.doCapStep();
-            //encoderControl.resetRotation();
-        } else if (stepperControl.getCurrentAction() == StepperActions::Cycling) {
-            stepperControl.stopActions();
-        }
-    }
-
-    stepperControl.processState();
-}
-
-void ProcessSensorButton() {
-    sensorButton.processState();
-
-    if (sensorButton.getUserAction() == ButtonAction::Release) {
-        categoryDetected = ReadColor();
-        displayControl.setLineText("TAPITANATOR 9KPP", 0, TextAlignment::Left);
-        displayControl.setLineText(ConvertColorCategoryToChar(categoryDetected), 1, TextAlignment::Center);
-    }
-}
-
-void ProcessPanicButton() {
-    panicButton.processState();
-
-    if (panicButton.getUserAction() == ButtonAction::Release) {
-        stepperControl.stopActions();
-    }
-}
-
-void ProcessDisplayState() {
-    if (displayControl.rested()) {
-        displayControl.processState();
-    }
-}*/

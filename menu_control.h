@@ -5,34 +5,42 @@
 #ifndef CLASIFICADORA_TI3_MENU_CONTROL_H
 #define CLASIFICADORA_TI3_MENU_CONTROL_H
 
+struct MenuItemS {
+    const int id;
+    const int parentId;
+    const int siblingIndex;
+    const char text[20];
+    const int action;
+};
+
 class MenuItem {
 public:
     MenuItem();
-    MenuItem(int p_id, int p_parent_id, int p_sibling_index, char p_text[17], enum MenuActions p_action);
+    MenuItem(int, int, int, const char [20], int);
 
-    int getId();
-    int getParentId();
-    int getSiblingIndex();
-    char* getText();
-    enum MenuActions getAction();
+    int getId() const;
+    int getParentId() const;
+    int getSiblingIndex() const;
+    char * getText() const;
+    enum MenuActions getAction() const;
 
-    int getNextSiblingId(MenuItem p_menu[36]);
-    int getPrevSiblingId(MenuItem p_menu[36]);
-    int getSiblingCount(MenuItem p_menu[36]);
+    int getNextSiblingId(const MenuItem (&)[36]) const;
+    int getPrevSiblingId(const MenuItem (&)[36]) const;
+    int getSiblingCount(const MenuItem (&)[36]) const;
 
-    int getFirstChild(MenuItem p_menu[36]);
+    int getFirstChild(const MenuItem (&)[36]) const;
 
 private:
-    int id;
-    int parentId;
-    int siblingIndex;
-    enum MenuActions action;
-    char text[17];
+    const int id;
+    const int parentId;
+    const int siblingIndex;
+    const int action;
+    const char text[20];
 };
 
 class MenuControl {
 public:
-    MenuControl(MenuItem p_menu[36], DisplayControl &displayControl);
+    MenuControl(const MenuItem (&)[36], DisplayControl (&));
 
     void processState();
     void initialize();
@@ -50,7 +58,7 @@ public:
     void setLock(int p_duration);
 
 private:
-    MenuItem menu[36];
+    const MenuItem (&menu)[36];
     enum MenuActions currentAction;
     int currentMenuItemId;
     bool initialized;

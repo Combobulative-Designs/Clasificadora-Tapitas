@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <Wire.h>
+//#include <Wire.h>
 
 #include "common_stuff.h"
 
@@ -53,7 +53,7 @@ int ButtonState::getCyclesHeld() {return cyclesHeld;}
 unsigned long ButtonState::getLastReading() {return lastReading;}
 ButtonAction ButtonState::getUserAction() {return userAction;}
 bool ButtonState::debounced() {return (lastReading + debounceDelay <= millis());}
-
+/*
 int I2CScanner(byte addrs[]) {
     Wire.begin();
 
@@ -96,23 +96,23 @@ int I2CScanner(byte addrs[]) {
 
     Wire.end();
     return devCount;
-}
+}*/
 
 char* ConvertColorCategoryToChar(ColorCategory p_category) {
     switch (p_category) {
         case ColorCategory::Reds:
-            return "Reds";
+            return (char*)F("Reds");
         case ColorCategory::Yellows:
-            return "Yellows";
+            return (char*)F("Yellows");
         case ColorCategory::Blues:
-            return "Blues";
+            return (char*)F("Blues");
         case ColorCategory::Greens:
-            return "Greens";
+            return (char*)F("Greens");
         case ColorCategory::Whites:
-            return "Whites";
+            return (char*)F("Whites");
         case ColorCategory::Greys:
-            return "Greys";
+            return (char*)F("Greys");
         default: //Blacks
-            return "Blacks";
+            return (char*)F("Blacks");
     }
 }
