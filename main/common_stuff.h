@@ -38,10 +38,7 @@ public:
     ButtonState();
 
     void attach(int p_pin_button, int p_debounce_delay);
-    //int getState();
     ButtonAction getUserAction();
-    //int getCyclesHeld();
-    //unsigned long getLastReading();
     bool debounced();
 
     void processState();
@@ -52,7 +49,6 @@ private:
     bool initialized;
     int state;
     enum ButtonAction userAction;
-    //int cyclesHeld;
     unsigned long lastReading;
     int debounceDelay;
 };
