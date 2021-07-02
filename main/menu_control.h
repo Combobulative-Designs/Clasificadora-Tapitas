@@ -13,31 +13,6 @@ struct MenuItemS {
     const int action;
 };
 
-/*class MenuItem {
-public:
-    MenuItem();
-    MenuItem(int, int, int, const char [20], int);
-
-    int getId() const;
-    int getParentId() const;
-    int getSiblingIndex() const;
-    char * getText() const;
-    enum MenuActions getAction() const;
-
-    int getNextSiblingId(const MenuItem (&)[36]) const;
-    int getPrevSiblingId(const MenuItem (&)[36]) const;
-    int getSiblingCount(const MenuItem (&)[36]) const;
-
-    int getFirstChild(const MenuItem (&)[36]) const;
-
-private:
-    const int id;
-    const int parentId;
-    const int siblingIndex;
-    const int action;
-    const char text[20];
-};*/
-
 class MenuControl {
 public:
     MenuControl(const MenuItemS (&)[36], DisplayControl (&));
