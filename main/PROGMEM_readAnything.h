@@ -1,4 +1,4 @@
-# Tomado del post por Nick Gammon aqui: http://www.gammon.com.au/forum/?id=12615&reply=3#reply3
+//Tomado del post por Nick Gammon aqui: http://www.gammon.com.au/forum/?id=12615&reply=3#reply3
 
 #include <Arduino.h>  // for type definitions
 
