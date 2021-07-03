@@ -6,6 +6,7 @@ enum class MenuUserActions {Next, Previous, Enter, Return};
 enum class RotationDirection {Clockwise, CounterClockwise};
 enum class ButtonAction {Press, Hold, Release, Rest};
 enum class TextAlignment {Left, Right, Center};
+enum class SensorAuxLEDMode {Off, Manual, Auto};
 enum class ColorCategory {
     Reds, Yellows, Blues,
     Greens, Whites, Greys,
@@ -53,7 +54,6 @@ private:
     int debounceDelay;
 };
 
-//int I2CScanner(byte addrs[]);
 char* ConvertColorCategoryToChar(ColorCategory category);
 
 #endif //CLASIFICADORA_COMMON_STUFF_H

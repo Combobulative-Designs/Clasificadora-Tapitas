@@ -3,7 +3,8 @@
 
 #include "common_stuff.h"
 
-#include "sensor_dummy.h"
+
+#include "sensor_control.h"
 #include "servo_control.h"
 #include "stepper_control.h"
 //#include "encoder_control.h"
@@ -82,6 +83,7 @@ ButtonState buttonNext;
 ButtonState buttonReturn;
 ButtonState buttonEnter;
 
+SensorControl sensorControl(16);
 StepperControl stepperControl(8, 9, 10, 11);
 ServoControl servoControl(12);
 DisplayControl displayControl(0x27, 16, 2, 50);
@@ -96,13 +98,10 @@ void setup() {
     buttonReturn.attach(4, 50);
     buttonEnter.attach(5, 50);
 
-    InitSensor();
+    sensorControl.initialize();
     displayControl.initialize();
     stepperControl.initialize();
     servoControl.initialize();
-
-    pinMode(13, OUTPUT);
-    digitalWrite(13, LOW);
 
     displayControl.noNavArrows();
     displayControl.setLineText(
@@ -131,5 +130,8 @@ void loop() {
     if (buttonEnter.getUserAction() == ButtonAction::Release) menuControl.triggerUserAction(MenuUserActions::Enter);
 
     menuControl.processState();
+
     displayControl.processState();
+
+    sensorControl.processState();
 }
