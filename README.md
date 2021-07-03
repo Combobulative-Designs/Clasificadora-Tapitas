@@ -46,6 +46,8 @@ mas otros adicionales obtenidos individualmente por el equipo. Entre estos se en
 - Resistencia de 10K Ohm x 4
 - Resistencia de 200 Ohm x 1
 - Resistencia de 1M Ohm x 1
+- LED RGD x 1
+- LED Blanco x 1
 - Buzzer x 1
 - Sensor de color TCS34725 x 1
 - Pantalla LCD de 1602 + Modulo I2C x 1
@@ -58,6 +60,12 @@ mas otros adicionales obtenidos individualmente por el equipo. Entre estos se en
 
 Y muchos cablecitos.
 
+### Circuito
+
+El circuito utilizado fue el siguiente:
+
+![Diagrama](/resources/img/circuit.png)
+
 ### Programacion del Arduino
 
 Debido a haber varias funcionalidades necesarias para realizar el procedimiento
@@ -65,16 +73,29 @@ de clasificacion, se busco separar cada una y convertirla en una biblioteca a la
 cual referenciar luego desde el sketch principal.
 
 Las librerias desarrolladas fueron:
-- common_stuff
-- sensor_dummy
-- stepper_control
-- servo_control
-- encoder_control
-- display_control
-- menu_control
-- auto_control
+- common_stuff (Funciones, enumerables, clases, y etc. en comun para todo el programa)
+- sensor_dummy (control del sensor de color)
+- stepper_control (control del motor paso a paso)
+- servo_control (control del micro servo motor)
+- encoder_control (control del codificador rotatorio)
+- display_control (control del display LCD)
+- menu_control (control del menu del programa)
+- auto_control (control del script de clasificacion automatica e interface entre el menu y los componentes)
 
 Adicionalmente se utilizaron las librerias de 3er siguientes:
 - AccelStepper
 - LiquidCrystal_I2C
-- 
+- PROGMEM_readAnything
+- Servo
+- Arduino
+
+Por ultimo, la Universidad nos provio de las siguientes librerias para operar el sensor de color:
+- COLOR
+- Adafruit_TCS34725
+- ColorConverterLib.h
+
+### Librerias
+
+### Ensablado
+
+### Operacion
