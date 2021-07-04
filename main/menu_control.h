@@ -1,6 +1,7 @@
 #include "common_stuff.h"
 
 #include "display_control.h"
+#include "sorter_control.h"
 
 #ifndef CLASIFICADORA_TI3_MENU_CONTROL_H
 #define CLASIFICADORA_TI3_MENU_CONTROL_H

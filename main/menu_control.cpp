@@ -4,6 +4,7 @@
 #include "common_stuff.h"
 
 #include "display_control.h"
+#include "sorter_control.h"
 #include "menu_control.h"
 
 
