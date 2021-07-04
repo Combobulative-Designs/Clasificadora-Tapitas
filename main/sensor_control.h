@@ -5,7 +5,7 @@
 
 class SensorControl {
 public:
-    SensorControl(int);
+    SensorControl(int p_pin_aux_led);
 
     void initialize();
     void processState();

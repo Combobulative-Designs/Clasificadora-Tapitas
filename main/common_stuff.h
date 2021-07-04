@@ -7,6 +7,13 @@ enum class RotationDirection {Clockwise, CounterClockwise};
 enum class ButtonAction {Press, Hold, Release, Rest};
 enum class TextAlignment {Left, Right, Center};
 enum class SensorAuxLEDMode {Off, Manual, Auto};
+enum class RGBColors {
+    Off,
+    Red, Green, Blue ,
+    Cyan, Magenta, Yellow,
+    White,
+    Raspberry
+};
 enum class ColorCategory {
     Reds, Yellows, Blues,
     Greens, Whites, Greys,

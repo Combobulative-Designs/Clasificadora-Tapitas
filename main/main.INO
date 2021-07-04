@@ -8,30 +8,36 @@
 #include "servo_control.h"
 #include "stepper_control.h"
 //#include "encoder_control.h"
+#include "rgb_control.h"
 #include "display_control.h"
 #include "menu_control.h"
-/*
+
 #define PIN_BUTTON_PREV 2
 #define PIN_BUTTON_NEXT 3
 #define PIN_BUTTON_RETURN 4
 #define PIN_BUTTON_ENTER 5
-*//*
-#define PIN_ENCODER_CLK 6
-#define PIN_ENCODER_DT 7
-*//*
-#define PIN_STEPPER_IN1 8
-#define PIN_STEPPER_IN2 9
-#define PIN_STEPPER_IN3 10
-#define PIN_STEPPER_IN4 11
-*//*
+
+#define PIN_RELAY_SIGNAL 6
+
+#define PIN_ENCODER_CLK 7
+#define PIN_ENCODER_DT 8
+
+#define PIN_RGB_LED_RED 9
+#define PIN_RGB_LED_GRE 10
+#define PIN_RGB_LED_BLU 11
+
 #define PIN_SERVO_SIGNAL 12
-*//*
-#define PIN_SENSOR_LED 13
-*//*
-#define CYCLE_DURATION 20
+
+#define PIN_SENSOR_AUX_LED 13
+
+#define PIN_STEPPER_IN1 17
+#define PIN_STEPPER_IN2 16
+#define PIN_STEPPER_IN3 15
+#define PIN_STEPPER_IN4 14
+
 #define DEBOUNCE_DELAY 50
 #define REST_DELAY 50
-*/
+
 enum ColorCategory categoryDetected = ColorCategory::Blacks;
 
 const MenuItemS PROGMEM menu_01 = {1, 0, 0, "TAPINATOR 9KPP\0\0\0\0\0", 17};
@@ -83,25 +89,30 @@ ButtonState buttonNext;
 ButtonState buttonReturn;
 ButtonState buttonEnter;
 
-SensorControl sensorControl(16);
-StepperControl stepperControl(8, 9, 10, 11);
-ServoControl servoControl(12);
-DisplayControl displayControl(0x27, 16, 2, 50);
+SensorControl sensorControl(PIN_SENSOR_AUX_LED);
+StepperControl stepperControl(PIN_STEPPER_IN1, PIN_STEPPER_IN2, PIN_STEPPER_IN3, PIN_STEPPER_IN4);
+ServoControl servoControl(PIN_SERVO_SIGNAL);
+DisplayControl displayControl(0x27, 16, 2, REST_DELAY);
+RGBControl rgbControl(PIN_RGB_LED_RED, PIN_RGB_LED_GRE, PIN_RGB_LED_BLU);
 MenuControl menuControl(menu2, displayControl);
-
 
 void setup() {
     Serial.begin(9600);
 
-    buttonPrev.attach(2, 50);
-    buttonNext.attach(3, 50);
-    buttonReturn.attach(4, 50);
-    buttonEnter.attach(5, 50);
+    buttonPrev.attach(PIN_BUTTON_PREV, DEBOUNCE_DELAY);
+    buttonNext.attach(PIN_BUTTON_NEXT, DEBOUNCE_DELAY);
+    buttonReturn.attach(PIN_BUTTON_RETURN, DEBOUNCE_DELAY);
+    buttonEnter.attach(PIN_BUTTON_ENTER, DEBOUNCE_DELAY);
 
     sensorControl.initialize();
     displayControl.initialize();
     stepperControl.initialize();
     servoControl.initialize();
+    rgbControl.initialize();
+
+    pinMode(PIN_RGB_LED_RED, OUTPUT);
+    pinMode(PIN_RGB_LED_BLU, OUTPUT);
+    pinMode(PIN_RGB_LED_GRE, OUTPUT);
 
     displayControl.noNavArrows();
     displayControl.setLineText(
@@ -116,6 +127,35 @@ void setup() {
     delay(3000);
 
     menuControl.initialize();
+
+
+    rgbControl.setColor(RGBColors::Red);
+    rgbControl.processState();
+    delay(1000);
+    rgbControl.setColor(RGBColors::Green);
+    rgbControl.processState();
+    delay(1000);
+    rgbControl.setColor(RGBColors::Blue);
+    rgbControl.processState();
+    delay(1000);
+    rgbControl.setColor(RGBColors::White);
+    rgbControl.processState();
+    delay(1000);
+    rgbControl.setColor(RGBColors::Cyan);
+    rgbControl.processState();
+    delay(1000);
+    rgbControl.setColor(RGBColors::Magenta);
+    rgbControl.processState();
+    delay(1000);
+    rgbControl.setColor(RGBColors::Yellow);
+    rgbControl.processState();
+    delay(1000);
+    rgbControl.setColor(RGBColors::Raspberry);
+    rgbControl.processState();
+    delay(1000);
+    rgbControl.setColor(RGBColors::Off);
+    rgbControl.processState();
+    delay(1000);
 }
 
 void loop() {
@@ -130,8 +170,6 @@ void loop() {
     if (buttonEnter.getUserAction() == ButtonAction::Release) menuControl.triggerUserAction(MenuUserActions::Enter);
 
     menuControl.processState();
-
     displayControl.processState();
-
     sensorControl.processState();
 }

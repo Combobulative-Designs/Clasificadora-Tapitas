@@ -10,20 +10,12 @@
 class TextLine {
 public:
     TextLine();
-    //int getTotalCycles();
     void generateVisibleLine(int p_columns);
 
     char completeLine[30] = {0};
     char visibleLine[17] = {0};
     char oldCompleteLine[30] = {0};
     char oldVisibleLine[17] = {0};
-    //char lineBuffer[22];
-    //PString lineProcessor;
-    /*int marqueeDelayBefore = 0;
-    int marqueeDelayAfter = 0;
-    int marqueeSpeed = 300;
-    int marqueeCurrentIndex = 0;
-    int marqueeCurrentCycle = 0;*/
     TextAlignment alignment;
 };
 
