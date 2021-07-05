@@ -43,15 +43,13 @@ void MenuControl::triggerUserAction(enum MenuUserActions p_user_action) {
                 currentAction = MenuActions::NavigateToId;
                 break;
             case MenuUserActions::Return:
-                //sorterControl.stopProgram();
-
-
-
-
-
-                currentAction = MenuActions::NavigateToId;
-                if (canGoBack()) {
-                    currentMenuItemId = getMenuItem(currentMenuItemId).parentId;
+                if (sorterControl.isBusy()) {
+                    sorterControl.stopProgram();
+                } else {
+                    currentAction = MenuActions::NavigateToId;
+                    if (canGoBack()) {
+                        currentMenuItemId = getMenuItem(currentMenuItemId).parentId;
+                    }
                 }
                 break;
             default:

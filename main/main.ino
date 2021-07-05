@@ -42,8 +42,6 @@
 #define DEBOUNCE_DELAY 50
 #define REST_DELAY 50
 
-enum ColorCategory categoryDetected = ColorCategory::Blacks;
-
 const MenuItemS PROGMEM menu_01 = {1, 0, 0, "TAPINATOR 9KPP\0\0\0\0\0", 17};
 const MenuItemS PROGMEM menu_02 = {2, 1, 0, "Iniciar Ya\0\0\0\0\0\0\0\0\0", 0};
 const MenuItemS PROGMEM menu_03 = {3, 1, 1, "Clasificar\0\0\0\0\0\0\0\0\0", 18};

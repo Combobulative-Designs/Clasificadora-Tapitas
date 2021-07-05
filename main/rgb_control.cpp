@@ -42,7 +42,7 @@ void RGBControl::setColor(enum RGBColors p_color) {
 }
 
 bool RGBControl::isRested() {
-    return (millis() - lastActivity >= 50);
+    return (millis() - lastActivity >= 500);
 }
 
 void RGBControl::processState() {

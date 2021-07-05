@@ -53,6 +53,9 @@ void SorterControl::startProgram(enum SorterPrograms p_program) {
 void SorterControl::stopProgram() {
     if (initialized and currentProgram != SorterPrograms::Rest and !locked) {
         stopSignal = true;
+        displayControl.noNavArrows();
+        displayControl.setLineText((char*)"Deteniendo\0\0\0\0\0\0\0\0\0", 0, TextAlignment::Center);
+        displayControl.setLineText((char*)"...\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 1, TextAlignment::Center);
     }
 }
 
@@ -193,7 +196,7 @@ void SorterControl::PGM_ManualSensor() {
             case 4:
                 if (!sensorControl.isBusy()) {
                     colorCategoryRead = sensorControl.getColorRead();
-                    displayControl.setLineText(ConvertColorCategoryToChar(colorCategoryRead), 0, TextAlignment::Center);
+                    displayControl.setLineText(ConvertColorCategoryToChar(colorCategoryRead), 1, TextAlignment::Center);
                     currentProgramStep++;
                 }
                 break;
@@ -222,7 +225,19 @@ void SorterControl::PGM_ByStepNext() {
                 break;
             case 2:
                 displayControl.noNavArrows();
-                displayControl.setLineText((char*)"Clasificando\0\0\0\0\0\0\0", 0, TextAlignment::Center);
+                switch (lastAction) {
+                    case SorterActions::ServoTurn:
+                        displayControl.setLineText((char*)"Mov. disco\0\0\0\0\0\0\0\0\0", 0, TextAlignment::Center);
+                        break;
+                    case SorterActions::DiscStep:
+                        displayControl.setLineText((char*)"Detectando\0\0\0\0\0\0\0\0\0", 0, TextAlignment::Center);
+                        break;
+                    case SorterActions::ColorReading:
+                        displayControl.setLineText((char*)"Mov. servo\0\0\0\0\0\0\0\0\0", 0, TextAlignment::Center);
+                        break;
+                    default:
+                        break;
+                }
                 displayControl.setLineText((char*)"...\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 1, TextAlignment::Center);
                 currentProgramStep++;
                 break;
@@ -297,15 +312,20 @@ void SorterControl::PGM_ByStepNext() {
 
 void SorterControl::PGM_Automatic() {
     if (initialized) {
+        if (stopSignal) {
+        }
         switch (currentProgramStep) {
             case 1:
+                locked = false;
                 programStartTime = millis();
                 currentProgramStep++;
                 break;
             case 2:
-                displayControl.noNavArrows();
-                displayControl.setLineText((char*)"Clasificando\0\0\0\0\0\0\0", 0, TextAlignment::Center);
-                displayControl.setLineText((char*)"...\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 1, TextAlignment::Center);
+                if (!stopSignal) {
+                    displayControl.noNavArrows();
+                    displayControl.setLineText((char*)"Clasificando\0\0\0\0\0\0\0", 0, TextAlignment::Center);
+                    displayControl.setLineText((char*)"...\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 1, TextAlignment::Center);
+                }
                 currentProgramStep++;
                 break;
             case 3:
@@ -323,6 +343,7 @@ void SorterControl::PGM_Automatic() {
                         }
                         break;
                     case SorterActions::ColorReading:
+                        rgbControl.setColor(RGBColors::Green);
                         servoControl.moveToColor(colorCategoryRead);
                         currentProgramStep++;
                         break;
@@ -343,7 +364,9 @@ void SorterControl::PGM_Automatic() {
                         }
                         break;
                     case SorterActions::ColorReading:
-                        currentProgramStep++;
+                        if (rgbControl.isRested()) {
+                            currentProgramStep++;
+                        }
                         break;
                     default:
                         break;
@@ -359,6 +382,7 @@ void SorterControl::PGM_Automatic() {
                         lastAction = SorterActions::ColorReading;
                         break;
                     case SorterActions::ColorReading:
+                        rgbControl.setColor(RGBColors::Off);
                         lastAction = SorterActions::ServoTurn;
                         break;
                     default:
@@ -384,6 +408,7 @@ void SorterControl::PGM_CycleStepper() {
     if (initialized) {
         switch (currentProgramStep) {
             case 1:
+                locked = false;
                 programStartTime = millis();
                 currentProgramStep++;
                 break;

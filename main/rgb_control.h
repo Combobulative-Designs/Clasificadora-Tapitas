@@ -11,6 +11,7 @@ public:
 
     void initialize();
     void setColor(enum RGBColors p_color);
+    bool isRested();
 
 private:
     int pinBlue;
@@ -22,7 +23,6 @@ private:
     bool stateChanged;
     unsigned long lastActivity;
 
-    bool isRested();
     void writeToLED(int p_value_red, int p_value_green, int p_value_blue);
 };
 
