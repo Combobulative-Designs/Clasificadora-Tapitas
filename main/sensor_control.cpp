@@ -34,7 +34,6 @@ bool SensorControl::isBusy() {
 }
 
 enum ColorCategory SensorControl::getColorRead() {
-    Serial.println((int)colorRead);
     return colorRead;
 }
 

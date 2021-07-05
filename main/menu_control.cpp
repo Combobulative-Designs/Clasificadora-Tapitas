@@ -8,22 +8,22 @@
 #include "menu_control.h"
 
 
-MenuControl::MenuControl(const MenuItemS (&p_menu)[36], DisplayControl &p_displayControl) :
+MenuControl::MenuControl(const MenuItemS (&p_menu)[36], DisplayControl &p_displayControl, SorterControl &p_sorterControl) :
     initialized(false),
     stateChanged(false),
-    lockDuration(0),
     inactivityTimer(15000),
-    restDelay(50),
     displayControl(p_displayControl),
+    sorterControl(p_sorterControl),
     menu(p_menu)
-{}
+    {}
 
 void MenuControl::initialize() {
     if (!initialized) {
         currentMenuItemId = 2;
         lastActivity = millis();
 
-        printToScreenMenuItem();
+        sorterControl.initialize();
+        isSorterBusy = sorterControl.isBusy();
 
         initialized = true;
     }
@@ -31,37 +31,37 @@ void MenuControl::initialize() {
 
 void MenuControl::triggerUserAction(enum MenuUserActions p_user_action) {
     if (initialized) {
-        if (rested()) {
-            if (!locked()) {
-                stateChanged = true;
-                lastActivity = millis();
-                switch (p_user_action) {
-                    case MenuUserActions::Previous:
-                        currentMenuItemId = getPrevSiblingId();
-                        currentAction = MenuActions::NavigateToId;
-                        break;
-                    case MenuUserActions::Next:
-                        currentMenuItemId = getNextSiblingId();
-                        currentAction = MenuActions::NavigateToId;
-                        break;
-                    case MenuUserActions::Return:
-                        currentAction = MenuActions::NavigateToId;
-                        if (canGoBack()) {
-                            currentMenuItemId = getMenuItem(currentMenuItemId).parentId;
-                        }
-                        break;
-                    default:
-                        currentAction = (MenuActions)getMenuItem(currentMenuItemId).action;
-                        if (currentAction == MenuActions::None) stateChanged = false;
-                        break;
+        stateChanged = true;
+        lastActivity = millis();
+        switch (p_user_action) {
+            case MenuUserActions::Previous:
+                currentMenuItemId = getPrevSiblingId();
+                currentAction = MenuActions::NavigateToId;
+                break;
+            case MenuUserActions::Next:
+                currentMenuItemId = getNextSiblingId();
+                currentAction = MenuActions::NavigateToId;
+                break;
+            case MenuUserActions::Return:
+                //sorterControl.stopProgram();
+
+
+
+
+
+                currentAction = MenuActions::NavigateToId;
+                if (canGoBack()) {
+                    currentMenuItemId = getMenuItem(currentMenuItemId).parentId;
                 }
-            }
+                break;
+            default:
+                currentAction = (MenuActions)getMenuItem(currentMenuItemId).action;
+                if (currentAction == MenuActions::None) stateChanged = false;
+                break;
         }
     }
 }
 
-bool MenuControl::locked() { if (lockDuration == 0) return false; return (millis() >= lockFrom + lockDuration); }
-bool MenuControl::rested() { return (millis() >= lastActivity + restDelay); }
 bool MenuControl::inactive() { if (inactivityTimer == 0) return false; return (millis() >= lastActivity + inactivityTimer); }
 bool MenuControl::canGoBack() { return (getMenuItem(currentMenuItemId).parentId != 1); }
 
@@ -128,8 +128,6 @@ MenuItemS MenuControl::getMenuItem(int p_id) {
     }
 }
 
-void MenuControl::setLock(int p_duration) { lockDuration = p_duration; lockFrom = millis(); }
-
 void MenuControl::printToScreenMenuItem() {
     if (getSiblingCount() > 1) {
         displayControl.navArrows();
@@ -149,34 +147,40 @@ void MenuControl::printToScreenMenuItem() {
 
 void MenuControl::processState() {
     if (initialized) {
+        if (isSorterBusy != sorterControl.isBusy()) {
+            isSorterBusy = sorterControl.isBusy();
+
+            if (!isSorterBusy) {
+                stateChanged = true;
+                currentAction = MenuActions::NavigateToId;
+            }
+        }
+
         if (stateChanged) {
             lastActivity = millis();
             stateChanged = false;
             switch (currentAction) {
                 case MenuActions::RunAuto:
-                    displayControl.noNavArrows();
-                    displayControl.setLineText((char*)F("Clasificando"), 0, TextAlignment::Center);
-                    displayControl.setLineText((char*)F("**"), 0, TextAlignment::Center);
+                    sorterControl.startProgram(SorterPrograms::Automatic);
                     break;
                 case MenuActions::RunStep:
-                    displayControl.noNavArrows();
-                    displayControl.setLineText((char*)F("Un paso..."), 0, TextAlignment::Center);
-                    displayControl.setLineText((char*)F("**"), 0, TextAlignment::Center);
+                    sorterControl.startProgram(SorterPrograms::ByStepNext);
                     break;
                 case MenuActions::DoSensorReading:
+                    sorterControl.startProgram(SorterPrograms::ManualSensor);
                     break;
                 case MenuActions::DoServoTurn:
+                    sorterControl.startProgram(SorterPrograms::ManualServo);
                     break;
                 case MenuActions::DoStepperCapStep:
+                    sorterControl.startProgram(SorterPrograms::ManualStepper);
                     break;
                 case MenuActions::DoStepperCWCycling:
+                    sorterControl.startProgram(SorterPrograms::ManualSensor);
                     break;
                 case MenuActions::DoStepperCCWCycling:
                     break;
                 case MenuActions::ShowTime:
-                    displayControl.noNavArrows();
-                    displayControl.setLineText((char *)F("Tiempo total:"), 0, TextAlignment::Center);
-                    displayControl.setLineText((char *)(millis() / 1000), 0, TextAlignment::Center);
                     break;
                 case MenuActions::ShowAmountTotal:
                     break;

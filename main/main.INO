@@ -35,6 +35,10 @@
 #define PIN_STEPPER_IN3 15
 #define PIN_STEPPER_IN4 14
 
+#define DISPLAY_ADDRESS 0x27
+#define DISPLAY_ROWS 2
+#define DISPLAY_COLUMNS 16
+
 #define DEBOUNCE_DELAY 50
 #define REST_DELAY 50
 
@@ -64,7 +68,7 @@ const MenuItemS PROGMEM menu_21 = {21, 17, 3, "Equipo 12\0\0\0\0\0\0\0\0\0\0", 1
 const MenuItemS PROGMEM menu_22 = {22, 3, 1, "Manual\0\0\0\0\0\0\0\0\0\0\0\0\0", 18};
 const MenuItemS PROGMEM menu_23 = {23, 22, 0, "Mover disco\0\0\0\0\0\0\0\0", 4};
 const MenuItemS PROGMEM menu_24 = {24, 22, 1, "Leer color\0\0\0\0\0\0\0\0\0", 2};
-const MenuItemS PROGMEM menu_25 = {25, 22, 2, "Mover sensor\0\0\0\0\0\0\0", 3};
+const MenuItemS PROGMEM menu_25 = {25, 22, 2, "Mover servo\0\0\0\0\0\0\0\0", 3};
 const MenuItemS PROGMEM menu_26 = {26, 3, 2, "Paso a paso\0\0\0\0\0\0\0\0", 18};
 const MenuItemS PROGMEM menu_27 = {27, 26, 0, "Siguiente\0\0\0\0\0\0\0\0\0\0", 1};
 const MenuItemS PROGMEM menu_28 = {28, 5, 0, "Tiempo\0\0\0\0\0\0\0\0\0\0\0\0\0", 7};
@@ -92,9 +96,10 @@ ButtonState buttonEnter;
 SensorControl sensorControl(PIN_SENSOR_AUX_LED);
 StepperControl stepperControl(PIN_STEPPER_IN1, PIN_STEPPER_IN2, PIN_STEPPER_IN3, PIN_STEPPER_IN4);
 ServoControl servoControl(PIN_SERVO_SIGNAL);
-DisplayControl displayControl(0x27, 16, 2, REST_DELAY);
 RGBControl rgbControl(PIN_RGB_LED_RED, PIN_RGB_LED_GRE, PIN_RGB_LED_BLU);
-MenuControl menuControl(menu2, displayControl);
+DisplayControl displayControl(DISPLAY_ADDRESS, DISPLAY_COLUMNS, DISPLAY_ROWS, REST_DELAY);
+SorterControl sorterControl(sensorControl, stepperControl, servoControl, rgbControl, displayControl);
+MenuControl menuControl(menu2, displayControl, sorterControl);
 
 void setup() {
     Serial.begin(9600);
@@ -104,61 +109,17 @@ void setup() {
     buttonReturn.attach(PIN_BUTTON_RETURN, DEBOUNCE_DELAY);
     buttonEnter.attach(PIN_BUTTON_ENTER, DEBOUNCE_DELAY);
 
-    sensorControl.initialize();
-    displayControl.initialize();
-    stepperControl.initialize();
-    servoControl.initialize();
-    rgbControl.initialize();
-
-    pinMode(PIN_RGB_LED_RED, OUTPUT);
-    pinMode(PIN_RGB_LED_BLU, OUTPUT);
-    pinMode(PIN_RGB_LED_GRE, OUTPUT);
-
-    displayControl.noNavArrows();
-    displayControl.setLineText(
-            (char*)"TAPITANATOR 9KPP",
-            0,
-            TextAlignment::Center);
-    displayControl.setLineText(
-            (char*)"¡Bienvenido!",
-            1,
-            TextAlignment::Center);
-
-    delay(3000);
-
     menuControl.initialize();
-
-
-    rgbControl.setColor(RGBColors::Red);
-    rgbControl.processState();
-    delay(1000);
-    rgbControl.setColor(RGBColors::Green);
-    rgbControl.processState();
-    delay(1000);
-    rgbControl.setColor(RGBColors::Blue);
-    rgbControl.processState();
-    delay(1000);
-    rgbControl.setColor(RGBColors::White);
-    rgbControl.processState();
-    delay(1000);
-    rgbControl.setColor(RGBColors::Cyan);
-    rgbControl.processState();
-    delay(1000);
-    rgbControl.setColor(RGBColors::Magenta);
-    rgbControl.processState();
-    delay(1000);
-    rgbControl.setColor(RGBColors::Yellow);
-    rgbControl.processState();
-    delay(1000);
-    rgbControl.setColor(RGBColors::Raspberry);
-    rgbControl.processState();
-    delay(1000);
-    rgbControl.setColor(RGBColors::Off);
-    rgbControl.processState();
-    delay(1000);
 }
 
 void loop() {
+    sensorControl.processState();
+    stepperControl.processState();
+    rgbControl.processState();
+    displayControl.processState();
+    sorterControl.processState();
+    menuControl.processState();
+
     buttonPrev.processState();
     buttonNext.processState();
     buttonReturn.processState();
@@ -168,8 +129,4 @@ void loop() {
     if (buttonNext.getUserAction() == ButtonAction::Release) menuControl.triggerUserAction(MenuUserActions::Next);
     if (buttonReturn.getUserAction() == ButtonAction::Release) menuControl.triggerUserAction(MenuUserActions::Return);
     if (buttonEnter.getUserAction() == ButtonAction::Release) menuControl.triggerUserAction(MenuUserActions::Enter);
-
-    menuControl.processState();
-    displayControl.processState();
-    sensorControl.processState();
 }

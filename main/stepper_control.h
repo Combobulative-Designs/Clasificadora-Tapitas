@@ -17,6 +17,7 @@ public:
     void doCapStep();
     void stopActions();
     StepperActions getCurrentAction();
+    bool isBusy();
 
 private:
     bool initialized;

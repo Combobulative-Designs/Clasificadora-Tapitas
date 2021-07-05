@@ -14,6 +14,21 @@ enum class RGBColors {
     White,
     Raspberry
 };
+enum class SorterActions {
+    DiscStep,
+    ColorReading,
+    ServoTurn
+};
+enum class SorterPrograms {
+    Rest,
+    ManualStepper,
+    ManualServo,
+    ManualSensor,
+    ByStepNext,
+    Automatic,
+    Startup,
+    CycleStepper
+};
 enum class ColorCategory {
     Reds, Yellows, Blues,
     Greens, Whites, Greys,

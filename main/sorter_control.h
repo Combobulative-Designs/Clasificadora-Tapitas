@@ -15,7 +15,10 @@ public:
 
     void processState();
     void initialize();
+    void startProgram(enum SorterPrograms);
+    void stopProgram();
 
+    bool isBusy();
 
 private:
     SensorControl &sensorControl;
@@ -25,8 +28,21 @@ private:
     DisplayControl &displayControl;
 
     bool initialized;
+    bool locked;
+    bool stopSignal;
+    enum SorterActions lastAction;
+    enum SorterPrograms currentProgram;
+    int currentProgramStep;
+    unsigned long programStartTime;
+    enum ColorCategory colorCategoryRead;
 
-    void runStartSequence();
+    void PGM_ManualStepper();
+    void PGM_ManualServo();
+    void PGM_ManualSensor();
+    void PGM_ByStepNext();
+    void PGM_Automatic();
+    void PGM_CycleStepper();
+    void PGM_Startup();
 };
 
 #endif //GITHUB_REPO_SORTER_CONTROL_H

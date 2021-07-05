@@ -16,7 +16,7 @@ struct MenuItemS {
 
 class MenuControl {
 public:
-    MenuControl(const MenuItemS (&)[36], DisplayControl (&));
+    MenuControl(const MenuItemS (&)[36], DisplayControl (&), SorterControl (&));
 
     void processState();
     void initialize();
@@ -31,12 +31,8 @@ public:
     int getSiblingCount();
     int getFirstChild();
 
-    bool locked();
-    bool rested();
     bool inactive();
     bool canGoBack();
-
-    void setLock(int p_duration);
 
 private:
     const MenuItemS (&menu)[36];
@@ -45,14 +41,13 @@ private:
     bool initialized;
     bool stateChanged;
 
-    int lockDuration;
-    unsigned long lockFrom;
-
     int inactivityTimer;
-    int restDelay;
     unsigned long lastActivity;
 
+    bool isSorterBusy;
+
     DisplayControl &displayControl;
+    SorterControl &sorterControl;
 
     void printToScreenMenuItem();
 };

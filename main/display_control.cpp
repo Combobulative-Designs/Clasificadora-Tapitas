@@ -57,7 +57,6 @@ void DisplayControl::initialize() {
     if (!initialized) {
         i2c_display.init();
         i2c_display.backlight();
-        i2c_display.print(F("Initializing..."));
         i2c_display.noCursor();
         backlightState = true;
         initialized = true;
@@ -95,16 +94,13 @@ void DisplayControl::processState() {
     /*if (backlightState and rested()) {i2c_display.noBacklight(); backlightState = false; }
     else if ((!backlightState) and (!rested())) {i2c_display.backlight(); backlightState = true; }*/
 
-    for (int row=0; row<rows; ++row) {
-        if (stateChanged) {
+    if (stateChanged) {
+        for (int row=0; row<rows; ++row) {
             for (int i = 0; i < 30; i++) lines[row].oldCompleteLine[i] = lines[row].completeLine[i];
             lines[row].generateVisibleLine(columns);
             for (int i = 0; i < 17; i++) lines[row].oldVisibleLine[i] = lines[row].visibleLine[i];
-            //stateChanged = true;
         }
-    }
-
-    if (stateChanged) {
+        
         lastWrite = millis();
         i2c_display.setCursor(0, 0);
         i2c_display.print(lines[0].visibleLine);
