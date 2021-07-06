@@ -35,22 +35,21 @@ private:
     enum StepperActions currentAction;
     enum StepperActions previousAction;
 
+    int stepSize;
+    int stepMax;
+
     //const int speed = 500;
     //const int totalSteps = 4096;
     //const int positions = 12;
-    const int positionSteps[12] = {
+    const int positionSteps[8] = {
             0,
-            341,
-            682,
-            1023,
-            1364,
-            1705,
-            2046,
-            2387,
-            2728,
-            3069,
-            3410,
-            3755
+            512,
+            1024,
+            1536,
+            2048,
+            2560,
+            3072,
+            3584
     };
 };
 

@@ -174,9 +174,10 @@ void MenuControl::processState() {
                     sorterControl.startProgram(SorterPrograms::ManualStepper);
                     break;
                 case MenuActions::DoStepperCWCycling:
-                    sorterControl.startProgram(SorterPrograms::ManualSensor);
+                    sorterControl.startProgram(SorterPrograms::CycleStepper);
                     break;
                 case MenuActions::DoStepperCCWCycling:
+                    sorterControl.startProgram(SorterPrograms::CycleStepper);
                     break;
                 case MenuActions::ShowTime:
                     break;

@@ -13,12 +13,14 @@
 SorterControl::SorterControl(SensorControl &p_sensorControl,
                              StepperControl &p_stepperControl,
                              ServoControl &p_servoControl,
+                             RelayControl &p_relayControl,
                              RGBControl &p_rgbControl,
                              DisplayControl &p_displayControl
                              ) :
                              sensorControl(p_sensorControl),
                              stepperControl(p_stepperControl),
                              servoControl(p_servoControl),
+                             relayControl(p_relayControl),
                              rgbControl(p_rgbControl),
                              displayControl(p_displayControl),
                              initialized(false),
@@ -36,6 +38,7 @@ void SorterControl::initialize() {
         sensorControl.initialize();
         stepperControl.initialize();
         servoControl.initialize();
+        relayControl.initialize();
         rgbControl.initialize();
         displayControl.initialize();
 
@@ -312,11 +315,10 @@ void SorterControl::PGM_ByStepNext() {
 
 void SorterControl::PGM_Automatic() {
     if (initialized) {
-        if (stopSignal) {
-        }
         switch (currentProgramStep) {
             case 1:
                 locked = false;
+                relayControl.on();
                 programStartTime = millis();
                 currentProgramStep++;
                 break;
@@ -391,6 +393,7 @@ void SorterControl::PGM_Automatic() {
                 if (stopSignal) {
                     currentProgram = SorterPrograms::Rest;
                     currentProgramStep = 99;
+                    relayControl.off();
                     stopSignal = false;
                 } else {
                     currentProgramStep = 3;
@@ -425,10 +428,11 @@ void SorterControl::PGM_CycleStepper() {
                 }
                 break;
             case 4:
-                if (millis() - programStartTime >= 100) currentProgramStep++;
+                if (millis() - programStartTime >= 1000) currentProgramStep++;
                 break;
             case 5:
                 if (stopSignal) {
+                    stepperControl.stopActions();
                     currentProgram = SorterPrograms::Rest;
                     currentProgramStep = 99;
                     stopSignal = false;

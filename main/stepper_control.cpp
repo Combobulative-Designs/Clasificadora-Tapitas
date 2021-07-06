@@ -13,6 +13,8 @@ StepperControl::StepperControl(int p_pinIN1, int p_pinIN2, int p_pinIN3, int p_p
     actionChange(false),
     currentAction(StepperActions::Resting),
     previousAction(StepperActions::Resting),
+    stepSize(512),
+    stepMax(4096),
     stepper(8, p_pinIN1, p_pinIN3, p_pinIN2, p_pinIN4)
     {}
 
@@ -29,7 +31,7 @@ void StepperControl::initialize() {
 
 void StepperControl::processState() {
     if (initialized) {
-        if (stepper.currentPosition() >= 4096) stepper.setCurrentPosition(stepper.currentPosition() - 4096);
+        if (stepper.currentPosition() >= stepMax) stepper.setCurrentPosition(stepper.currentPosition() - stepMax);
       
         switch (currentAction) {
             case StepperActions::Resting:
@@ -40,11 +42,11 @@ void StepperControl::processState() {
             case StepperActions::CapStep:
                 if (actionChange) {
                     actionChange = false;
-                    nextPosition = positionCounter + 1;
-                    if (nextPosition >= 12) { nextPosition = 0; }
+                    nextPosition = positionCounter + stepSize;
+                    if (nextPosition >= stepMax) { nextPosition = nextPosition - stepMax; }
                     stepper.enableOutputs();
                     stepper.setSpeed(500);
-                    stepper.moveTo(positionSteps[nextPosition]);
+                    stepper.moveTo(nextPosition);
                 }
                 if (stepper.currentPosition() == stepper.targetPosition()) {
                     positionCounter = nextPosition;
@@ -58,21 +60,21 @@ void StepperControl::processState() {
             case StepperActions::Cycling:
                 if (actionChange) {
                     actionChange = false;
-                    nextPosition = positionCounter + 1;
-                    if (nextPosition >= 12) { nextPosition = 0; }
+                    nextPosition = positionCounter + stepSize;
+                    if (nextPosition >= stepMax) { nextPosition = nextPosition - stepMax; }
                     stepper.enableOutputs();
-                    stepper.setSpeed(500);
-                    stepper.moveTo(positionSteps[nextPosition]);
+                    stepper.setSpeed(100);
+                    stepper.moveTo(nextPosition);
                 }
                 if (stepper.currentPosition() == stepper.targetPosition()) {
                     positionCounter = nextPosition;
-                    nextPosition = positionCounter + 1;
-                    if (nextPosition >= 12) { nextPosition = 0; }
-                    stepper.moveTo(positionSteps[nextPosition]);
-                    stepper.setSpeed(500);
+                    nextPosition = positionCounter + stepSize;
+                    if (nextPosition >= stepMax) { nextPosition = nextPosition - stepMax; }
+                    stepper.moveTo(nextPosition);
+                    stepper.setSpeed(100);
                     stepper.runSpeed();
                 } else {
-                    stepper.setSpeed(500);
+                    stepper.setSpeed(100);
                     stepper.runSpeed();
                 }
                 break;
