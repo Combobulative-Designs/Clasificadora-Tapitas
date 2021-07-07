@@ -16,7 +16,7 @@ struct MenuItemS {
 
 class MenuControl {
 public:
-    MenuControl(const MenuItemS (&)[36], DisplayControl (&), SorterControl (&));
+    MenuControl(const MenuItemS (&)[38], DisplayControl (&), SorterControl (&));
 
     void processState();
     void initialize();
@@ -35,7 +35,7 @@ public:
     bool canGoBack();
 
 private:
-    const MenuItemS (&menu)[36];
+    const MenuItemS (&menu)[38];
     enum MenuActions currentAction;
     int currentMenuItemId;
     bool initialized;

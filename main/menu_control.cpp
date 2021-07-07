@@ -8,7 +8,7 @@
 #include "menu_control.h"
 
 
-MenuControl::MenuControl(const MenuItemS (&p_menu)[36], DisplayControl &p_displayControl, SorterControl &p_sorterControl) :
+MenuControl::MenuControl(const MenuItemS (&p_menu)[38], DisplayControl &p_displayControl, SorterControl &p_sorterControl) :
     initialized(false),
     stateChanged(false),
     inactivityTimer(15000),
@@ -65,7 +65,7 @@ bool MenuControl::canGoBack() { return (getMenuItem(currentMenuItemId).parentId 
 
 int MenuControl::getSiblingCount() {
     int nodeCounter = 0;
-    for (int i = 0; i < 36; i++) {
+    for (int i = 0; i < 38; i++) {
         MenuItemS menuItem = {0, 0, 0, "asdasdasdasdasdasda", 0};
         PROGMEM_readAnything (&menu [i], menuItem);
         if (menuItem.parentId == getMenuItem(getCurrentMenuItemId()).parentId) nodeCounter++;
@@ -74,7 +74,7 @@ int MenuControl::getSiblingCount() {
 }
 
 int MenuControl::getFirstChild() {
-    for (int i = 0; i < 36; i++) {
+    for (int i = 0; i < 38; i++) {
         MenuItemS menuItem = {0, 0, 0, "asdasdasdasdasdasda", 0};
         PROGMEM_readAnything (&menu [i], menuItem);
         if (menuItem.parentId == getCurrentMenuItemId() and menuItem.siblingIndex == 0) return menuItem.id;
@@ -84,13 +84,13 @@ int MenuControl::getFirstChild() {
 
 int MenuControl::getNextSiblingId() {
     if (getMenuItem(getCurrentMenuItemId()).siblingIndex == getSiblingCount() - 1) {
-        for (int i = 0; i < 36; i++) {
+        for (int i = 0; i < 38; i++) {
             MenuItemS menuItem = {0, 0, 0, "asdasdasdasdasdasda", 0};
             PROGMEM_readAnything (&menu [i], menuItem);
             if (menuItem.parentId == getMenuItem(getCurrentMenuItemId()).parentId and menuItem.siblingIndex == 0) return menuItem.id;
         }
     } else {
-        for (int i = 0; i < 36; i++) {
+        for (int i = 0; i < 38; i++) {
             MenuItemS menuItem = {0, 0, 0, "asdasdasdasdasdasda", 0};
             PROGMEM_readAnything (&menu [i], menuItem);
             if (menuItem.parentId == getMenuItem(getCurrentMenuItemId()).parentId and menuItem.siblingIndex == getMenuItem(getCurrentMenuItemId()).siblingIndex + 1) return menuItem.id;
@@ -101,13 +101,13 @@ int MenuControl::getNextSiblingId() {
 
 int MenuControl::getPrevSiblingId() {
     if (getMenuItem(getCurrentMenuItemId()).siblingIndex == 0) {
-        for (int i = 0; i < 36; i++) {
+        for (int i = 0; i < 38; i++) {
             MenuItemS menuItem = {0, 0, 0, "asdasdasdasdasdasda", 0};
             PROGMEM_readAnything (&menu [i], menuItem);
             if (menuItem.parentId == getMenuItem(getCurrentMenuItemId()).parentId and menuItem.siblingIndex == getSiblingCount() - 1) return menuItem.id;
         }
     } else {
-        for (int i = 0; i < 36; i++) {
+        for (int i = 0; i < 38; i++) {
         MenuItemS menuItem = {0, 0, 0, "asdasdasdasdasdasda", 0};
         PROGMEM_readAnything (&menu [i], menuItem);
             if (menuItem.parentId == getMenuItem(getCurrentMenuItemId()).parentId and menuItem.siblingIndex == getMenuItem(getCurrentMenuItemId()).siblingIndex - 1) return menuItem.id;
@@ -119,7 +119,7 @@ int MenuControl::getPrevSiblingId() {
 enum MenuActions MenuControl::getCurrentAction() { return currentAction; }
 int MenuControl::getCurrentMenuItemId() { return currentMenuItemId; }
 MenuItemS MenuControl::getMenuItem(int p_id) {
-    for (int i = 0; i < 36; i++) {
+    for (int i = 0; i < 38; i++) {
         MenuItemS menuItem = {0, 0, 0, "asdasdasdasdasdasda", 0};
         PROGMEM_readAnything (&menu [i], menuItem);
         if (menuItem.id == p_id) return menuItem;
@@ -203,6 +203,9 @@ void MenuControl::processState() {
                 case MenuActions::NavigateDown:
                     currentMenuItemId = getFirstChild();
                     printToScreenMenuItem();
+                    break;
+                case MenuActions::ReadAndDisplayRawColor:
+                    sorterControl.startProgram(SorterPrograms::CalibrateSensor);
                     break;
                 default:
                     break;

@@ -27,7 +27,8 @@ enum class SorterPrograms {
     ByStepNext,
     Automatic,
     Startup,
-    CycleStepper
+    CycleStepper,
+    CalibrateSensor
 };
 enum class ColorCategory {
     Reds, Yellows, Blues,
@@ -53,8 +54,16 @@ enum class MenuActions {
     ShowAmountGreys, 
     NavigateToId, 
     None,
-    NavigateDown
+    NavigateDown,
+    ReadAndDisplayRawColor
 };
+
+typedef struct {
+    uint16_t white;
+    uint16_t red;
+    uint16_t blue;
+    uint16_t green;
+} RGBColor;
 
 class ButtonState {
 public:
@@ -77,5 +86,6 @@ private:
 };
 
 char* ConvertColorCategoryToChar(ColorCategory category);
+char* ConvertRGBColorToChar(RGBColor rgbColor);
 
 #endif //CLASIFICADORA_COMMON_STUFF_H

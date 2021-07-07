@@ -62,3 +62,34 @@ char* ConvertColorCategoryToChar(ColorCategory p_category) {
             return (char*)F("Blacks");
     }
 }
+
+char* ConvertRGBColorToChar(RGBColor rgbColor) {
+    char colorString[13];
+    char colorChannelString[5];
+    itoa((int)(rgbColor.red / rgbColor.white * 255.0), colorChannelString, 10);
+    for (int i = 0; i < 3; i++) {
+        colorString[i] = colorChannelString[i];
+    }
+    colorString[3] = ' ';
+    colorString[4] = ' ';
+    itoa((int)(rgbColor.blue / rgbColor.white * 255.0), colorChannelString, 10);
+    for (int i = 0; i < 3; i++) {
+        colorString[i+5] = colorChannelString[i];
+    }
+    colorString[8] = ' ';
+    colorString[9] = ' ';
+    itoa((int)(rgbColor.green / rgbColor.white * 255.0), colorChannelString, 10);
+    for (int i = 0; i < 3; i++) {
+        colorString[i+9] = colorChannelString[i];
+    }
+    colorString[12] = '!';
+    colorString[13] = '\0';
+    colorString[14] = '\0';
+    colorString[15] = '\0';
+    colorString[16] = '\0';
+    colorString[17] = '\0';
+    colorString[18] = '\0';
+    colorString[19] = '\0';
+    colorString[20] = '\0';
+    return colorString;
+};

@@ -38,14 +38,21 @@ private:
     int currentProgramStep;
     unsigned long programStartTime;
     enum ColorCategory colorCategoryRead;
+    unsigned long autoOperationTime;
+    int processedTotal;
+    int processedByColor[7];
+
+    void PGM_Startup();
+    void PGM_Automatic();
 
     void PGM_ManualStepper();
     void PGM_ManualServo();
     void PGM_ManualSensor();
+
     void PGM_ByStepNext();
-    void PGM_Automatic();
+
     void PGM_CycleStepper();
-    void PGM_Startup();
+    void PGM_SensorData();
 };
 
 #endif //GITHUB_REPO_SORTER_CONTROL_H

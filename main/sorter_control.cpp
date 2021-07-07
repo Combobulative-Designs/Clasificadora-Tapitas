@@ -30,7 +30,9 @@ SorterControl::SorterControl(SensorControl &p_sensorControl,
                              currentProgram(SorterPrograms::Startup),
                              currentProgramStep(1),
                              programStartTime(0),
-                             colorCategoryRead(ColorCategory::Blacks)
+                             colorCategoryRead(ColorCategory::Blacks),
+                             processedTotal(0),
+                             processedByColor{0,0,0,0,0,0,0}
                              {}
 
 void SorterControl::initialize() {
@@ -96,6 +98,9 @@ void SorterControl::processState() {
                 break;
             case SorterPrograms::CycleStepper:
                 PGM_CycleStepper();
+                break;
+            case SorterPrograms::CalibrateSensor:
+                PGM_SensorData();
                 break;
             case SorterPrograms::Startup:
                 PGM_Startup();
@@ -362,6 +367,8 @@ void SorterControl::PGM_Automatic() {
                     case SorterActions::DiscStep:
                         if (!sensorControl.isBusy()) {
                             colorCategoryRead = sensorControl.getColorRead();
+                            processedTotal++;
+                            processedByColor[(int)colorCategoryRead]++;
                             currentProgramStep++;
                         }
                         break;
@@ -492,4 +499,49 @@ void SorterControl::PGM_Startup() {
                 break;
         }
     }
+}
+
+void SorterControl::PGM_SensorData() {
+    if (initialized) {
+        switch (currentProgramStep) {
+            case 1:
+                locked = true;
+                programStartTime = millis();
+                currentProgramStep++;
+                break;
+            case 2:
+                displayControl.noNavArrows();
+                displayControl.setLineText((char*)"Detectando\0\0\0\0\0\0\0\0\0", 0, TextAlignment::Center);
+                displayControl.setLineText((char*)"...\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 1, TextAlignment::Center);
+                currentProgramStep++;
+                break;
+            case 3:
+                if (!sensorControl.isBusy()) {
+                    sensorControl.requestColorReading();
+                    currentProgramStep++;
+                }
+                break;
+            case 4:
+                if (!sensorControl.isBusy()) {
+                    colorCategoryRead = sensorControl.getColorRead();
+                    RGBColor colorRGBRead = sensorControl.getColorReadRGB();
+                    displayControl.setLineText((char*)"Detectado\0\0\0\0\0\0\0\0\0\0", 0, TextAlignment::Center);
+                    displayControl.setLineText(ConvertRGBColorToChar(colorRGBRead), 1, TextAlignment::Center);
+                    currentProgramStep++;
+                }
+                break;
+            case 5:
+                if (millis() - programStartTime >= 10000) currentProgramStep++;
+                break;
+            case 6:
+                locked = false;
+                currentProgramStep = 99;
+                currentProgram = SorterPrograms::Rest;
+                lastAction = SorterActions::ColorReading;
+                break;
+            default:
+                break;
+        }
+    }
+
 }

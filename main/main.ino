@@ -78,12 +78,14 @@ const MenuItemS PROGMEM menu_33 = {33, 29, 3, "Amarillos\0\0\0\0\0\0\0\0\0\0", 1
 const MenuItemS PROGMEM menu_34 = {34, 29, 4, "Blancos\0\0\0\0\0\0\0\0\0\0\0\0", 14};
 const MenuItemS PROGMEM menu_35 = {35, 29, 5, "Grises\0\0\0\0\0\0\0\0\0\0\0\0\0", 15};
 const MenuItemS PROGMEM menu_36 = {36, 29, 6, "Negros\0\0\0\0\0\0\0\0\0\0\0\0\0", 13};
+const MenuItemS PROGMEM menu_37 = {37, 4, 2, "Calib. Sensor\0\0\0\0\0\0", 18};
+const MenuItemS PROGMEM menu_38 = {38, 37, 0, "Leer\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 19};
 
-const MenuItemS menu2[36] PROGMEM = {
+const MenuItemS menu2[38] PROGMEM = {
   menu_01, menu_02, menu_03, menu_04, menu_05, menu_06, menu_07, menu_08, menu_09, menu_10,
   menu_11, menu_12, menu_13, menu_14, menu_15, menu_16, menu_17, menu_18, menu_19, menu_20,
   menu_21, menu_22, menu_23, menu_24, menu_25, menu_26, menu_27, menu_28, menu_29, menu_30,
-  menu_31, menu_32, menu_33, menu_34, menu_35, menu_36
+  menu_31, menu_32, menu_33, menu_34, menu_35, menu_36, menu_37, menu_38
 };
 
 ButtonState buttonPrev;
@@ -114,7 +116,7 @@ void setup() {
 void loop() {
     sensorControl.processState();
     stepperControl.processState();
-    sOutputDisplay.processState();
+    sOutputControl.processState();
     rgbControl.processState();
     displayControl.processState();
     sorterControl.processState();
