@@ -52,7 +52,7 @@ RGBColorNorm NormalizeRGBColor(RGBColor rgbColor) {
     rgbNorm.green = (int)(((float)rgbColor.green / rgbColor.white) * 255.0);
 
     return rgbNorm;
-};
+}
 
 char* ConvertColorCategoryToChar(ColorCategory p_category) {
     switch (p_category) {
@@ -73,33 +73,25 @@ char* ConvertColorCategoryToChar(ColorCategory p_category) {
     }
 }
 
-char* ConvertRGBColorToChar(RGBColor rgbColor) {
-    char colorString[13];
-    char colorChannelString[5];
-    itoa((int)(rgbColor.red / rgbColor.white * 255.0), colorChannelString, 10);
-    for (int i = 0; i < 3; i++) {
-        colorString[i] = colorChannelString[i];
+char* ConvertRGBColorToChar(RGBColor rgbColor, char* rgbNormStr) { 
+    RGBColorNorm rgbNorm = NormalizeRGBColor(rgbColor);
+    
+    for (int i = 0; i < 20; i++) {
+      rgbNormStr[i] = '\0';
     }
-    colorString[3] = ' ';
-    colorString[4] = ' ';
-    itoa((int)(rgbColor.blue / rgbColor.white * 255.0), colorChannelString, 10);
-    for (int i = 0; i < 3; i++) {
-        colorString[i+5] = colorChannelString[i];
+    char channelStr[3];
+    itoa(rgbNorm.red, channelStr, 10);
+    for (int i = 0; i < (log10(rgbNorm.red) + 1); i++) {
+        rgbNormStr[i] = channelStr[i];
     }
-    colorString[8] = ' ';
-    colorString[9] = ' ';
-    itoa((int)(rgbColor.green / rgbColor.white * 255.0), colorChannelString, 10);
-    for (int i = 0; i < 3; i++) {
-        colorString[i+9] = colorChannelString[i];
+    rgbNormStr[strlen(rgbNormStr)] = ',';
+    itoa(rgbNorm.blue, channelStr, 10);
+    for (int i = 0; i < (log10(rgbNorm.blue) + 1); i++) {
+        rgbNormStr[i+strlen(rgbNormStr)] = channelStr[i];
     }
-    colorString[12] = '!';
-    colorString[13] = '\0';
-    colorString[14] = '\0';
-    colorString[15] = '\0';
-    colorString[16] = '\0';
-    colorString[17] = '\0';
-    colorString[18] = '\0';
-    colorString[19] = '\0';
-    colorString[20] = '\0';
-    return colorString;
+    rgbNormStr[strlen(rgbNormStr)] = ',';
+    itoa(rgbNorm.green, channelStr, 10);
+    for (int i = 0; i < (log10(rgbNorm.green) + 1); i++) {
+        rgbNormStr[i+strlen(rgbNormStr)] = channelStr[i];
+    }
 };

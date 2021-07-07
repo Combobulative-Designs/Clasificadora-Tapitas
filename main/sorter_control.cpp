@@ -515,7 +515,7 @@ void SorterControl::PGM_SensorData() {
                 displayControl.setLineText((char*)"...\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 1, TextAlignment::Center);
                 currentProgramStep++;
                 break;
-            case 3:
+            case 3: |
                 if (!sensorControl.isBusy()) {
                     sensorControl.requestColorReading();
                     currentProgramStep++;
@@ -525,38 +525,15 @@ void SorterControl::PGM_SensorData() {
                 if (!sensorControl.isBusy()) {
                     colorCategoryRead = sensorControl.getColorRead();
                     RGBColor colorRGBRead = sensorControl.getColorReadRGB();
-                    RGBColorNorm rgbNorm = NormalizeRGBColor(colorRGBRead);
-                    char rgbStr[20];
-                    char channelStr[3];
-                    itoa(rgbNorm.red, channelStr, 10);
-                    for (int i = 0; i < 3; i++) {
-                        rgbStr[i] = channelStr[i];
-                    }
-                    rgbStr[strlen(rgbStr)] = ',';
-                    itoa(rgbNorm.blue, channelStr, 10);
-                    for (int i = 0; i < 3; i++) {
-                        rgbStr[i+strlen(rgbStr)] = channelStr[i];
-                    }
-                    rgbStr[strlen(rgbStr)] = ',';
-                    itoa(rgbNorm.green, channelStr, 10);
-                    for (int i = 0; i < 3; i++) {
-                        rgbStr[i+strlen(rgbStr)] = channelStr[i];
-                    }
-                    for (int i = strlen(rgbStr); i < 20; ++i) {
-                        rgbStr[i] = '\0';
-                    }
-                    displayControl.setLineText(rgbStr, 0, TextAlignment::Center);
-
-
-
-
-
-                    displayControl.setLineText(ConvertRGBColorToChar(colorRGBRead), 1, TextAlignment::Center);
+                    char colorRGBNormStr[11];
+                    ConvertRGBColorToChar(colorRGBRead, colorRGBNormStr);
+                    displayControl.setLineText((char*)"Color:\0\0\0\0\0\0\0\0\0\0\0\0\0", 0, TextAlignment::Center);
+                    displayControl.setLineText(colorRGBNormStr, 1, TextAlignment::Center);
                     currentProgramStep++;
                 }
                 break;
             case 5:
-                if (millis() - programStartTime >= 10000) currentProgramStep++;
+                if (millis() - programStartTime >= 5000) currentProgramStep++;
                 break;
             case 6:
                 locked = false;

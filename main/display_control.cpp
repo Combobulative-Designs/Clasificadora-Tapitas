@@ -121,7 +121,7 @@ void DisplayControl::setLineText(char p_text[], int p_lineIndex, enum TextAlignm
     stateChanged = true;
     for (int i = 0; i < strlen(p_text); i++) lines[p_lineIndex].completeLine[i] = p_text[i];
     lines[p_lineIndex].completeLine[strlen(p_text)] = '\0' ;
-    for (int i = strlen(lines[p_lineIndex].completeLine) + 1; i < 30; i++) lines[p_lineIndex].completeLine[i] = 0;
+    for (int i = strlen(lines[p_lineIndex].completeLine) + 1; i < 30; i++) lines[p_lineIndex].completeLine[i] = '\0';
     lines[p_lineIndex].alignment = p_alignment;
 }
 

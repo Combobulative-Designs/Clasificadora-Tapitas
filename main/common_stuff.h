@@ -93,6 +93,6 @@ private:
 
 RGBColorNorm NormalizeRGBColor(RGBColor rgbColor);
 char* ConvertColorCategoryToChar(ColorCategory category);
-char* ConvertRGBColorToChar(RGBColor rgbColor);
+char* ConvertRGBColorToChar(RGBColor rgbColor, char*);
 
 #endif //CLASIFICADORA_COMMON_STUFF_H
