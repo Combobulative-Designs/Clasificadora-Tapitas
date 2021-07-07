@@ -33,7 +33,7 @@ medidas se especifico un grosor de 3mm para todas las placas y laminas.
 
 ### Piezas 3D
 
-### Cortes en MDF
+### Placas
 
 ### Componentes
 
@@ -47,7 +47,6 @@ mas otros adicionales obtenidos individualmente por el equipo. Entre estos se en
 - Resistencia de 200 Ohm x 1
 - Resistencia de 1M Ohm x 1
 - LED RGD x 1
-- LED Blanco x 1
 - Buzzer x 1
 - Sensor de color TCS34725 x 1
 - Pantalla LCD de 1602 + Modulo I2C x 1
@@ -56,6 +55,9 @@ mas otros adicionales obtenidos individualmente por el equipo. Entre estos se en
 - Codificador rotatorio KY-040 x 1
 - Relay de 5V con 1 canal x 1
 - Motor DC de 3V x 4
+- Placa de PCB x 1
+- Switch de 2 posiciones x 1
+- Modulo de reduccion CC-CC (Convertidor XL7015 V2 DC-DC)
 - Transformador 220AC a 12V 2A x 1
 
 Y muchos cablecitos.
@@ -74,13 +76,14 @@ cual referenciar luego desde el sketch principal.
 
 Las librerias desarrolladas fueron:
 - common_stuff (Funciones, enumerables, clases, y etc. en comun para todo el programa)
-- sensor_dummy (control del sensor de color)
+- sensor_control (control del sensor de color)
 - stepper_control (control del motor paso a paso)
 - servo_control (control del micro servo motor)
-- encoder_control (control del codificador rotatorio)
+- rgb_control (control de LEDs RGB)
+- simple_output_control (control de estado para pines de salida, usado para leds, reles, y buzzers)
 - display_control (control del display LCD)
 - menu_control (control del menu del programa)
-- auto_control (control del script de clasificacion automatica e interface entre el menu y los componentes)
+- sorter_control (control del script de clasificacion automatica e interface entre el menu y los componentes)
 
 Adicionalmente se utilizaron las librerias de 3er siguientes:
 - AccelStepper
@@ -96,6 +99,97 @@ Por ultimo, la Universidad nos provio de las siguientes librerias para operar el
 
 ### Librerias
 
-### Ensablado
+<details>
+<summary markdown='span'/><b>common_stuff.h</b></summary>
+      
+Presenta funciones, enumeraciones, y estructuras de uso comun para todo el programa.
+* Funciones:
+  * `char* ConvertColorCategoryToChar(ColorCategory)`: Convierte un dato ColorCategory a c-string.
+  * `char* ConvertRGBColorToChar(RGBColor)`: Convierte un dato RGBColor a c-string.
+* Clases:
+  *  `ButtonState()`: Maneja el estado de una boton asociado a un pin usando attach(int pin, int debounce_delay);
+* Enumeraciones:
+  * `MenuUserActions`: Botones disponibles.
+  * `RotationDirection`: A reloj o contra. Para el paso a paso.
+  * `ButtonAction`: Estado de un boton.
+  * `TextAlignment`: Justificacion para textos.
+  * `SensorAuxLEDMode`: Modo de operacion del LED del sensor.
+  * `RGBColors`: Colores para LEDs RGB.
+  * `SorterActions`: Acciones individuales del sistema.
+  * `SorterPrograms`: Programas de operacion que se pueden ejecutar.
+  * `ColorCategories`: Categorias de colores a clasificar.
+  * `MenuActions`: Acciones disponibles para el boton 'entrar' en el menu.
+<br>
+</details>
+<details>
+<summary markdown='span'/><b>stepper_control.h</b></summary>
+      
+Definicion de clases asociadas al motor paso a paso.
+* Clases:
+  * `StepperControl(int, int, int, int)`: Controla e inicializa el motor.
+    * `initialize()`: Inicializa el motor con maxima velocidad en 500 y posicion 0.
+    * `processState()`: Opera el motor segun el estado del objecto.
+    * `doCycling()`: Cambia el estado para realizar el ciclaje continuo del motor.
+    * `doCapStep()`: Cambia el estado para realizar un giro de 30º.
+    * `stopActions()`: Cambia el estado para detener todas las acciones.
+    * `getCurrentAction()`: Devuelve la accion actual.
+    * `isBusy()`: Devuelve verdadero si el estado actual es de descanzo.
+* Enumeraciones:
+  * `StepperActions`: Operaciones que puede realizar el motor paso a paso.
+<br>
+</details>
+<details>
+<summary markdown='span'/><b>simple_output_control.h</b></summary>
+      
+Operacion de digital outputs.
+* Clase:
+  * `SOutputControl(int)`: Definicion, inicializacion, y operacion de digtal outputs.
+    * `initialize()`: Inicializa la salida en el pin y lo configura.
+    * `processState()`: Activa o desactiva el pin segun el estado dle objeto.
+    * `on()`: Cambia el estado a HIGH.
+    * `off()`: Cambia el estado a LOW.
+<br>
+</details>
+<details>
+<summary markdown='span'/><b>servo_control.h</b></summary>
+
+Operacion del servo motor.
+* Clase:
+  * `ServoControl(int)`: Operacion del servomotor, e inicializacion.
+    * `initialize()`: Inicializacion del objeto servo.
+    * `moveToColor(ColorCategory)`: A partir de color category, mover servo.
+<br>
+</details>
+<details>
+<summary markdown='span'/><b>rgb_control.h</b></summary>
+      
+Activacion y manejo de LEDs RGB.
+* Clase:
+  * `RGBControl(int, int, int)`: 
+    * `initialize()`: Configura valores por defecto.
+    * `processState()`: Opera el LED segun el estado de este.
+    * `setColor()` : Cambia el estado del LED.
+    * `isRested()`: Devuelve verdadero si el led esta descansando.
+<br>
+</details>
+<details>
+<summary markdown='span'/><b>display_control.h</b></summary>
+ 
+Operacion de Displays LCD por I2C.
+* Clases:
+  * `TextLine()`: Guarda una linea del display y expone metodos para usarla.
+    * `generateVisibleLine(int)`: Aplica alineacion y largo de cadena.
+  * `DisplayControl(byte, int, int, int)`: Operacion del display LCD I2C.
+    * `initialize()`: Inicializa el objeto display y crea chars especiales.
+    * `processState()`: Opera el display de acuerdo a cambios de estado.
+    * `setLineText(char [], int, enum TextAlignment)`: Cmabia el estado y conifugra una linea.
+    * `navArrows()`: Mostrar flechas de navegacion en la linea inferior.
+    * `noNavArrows()`: Ocultar flechas de navegacion en la linea inferior.
+    * `rested()`: Devuelve verdadero si el display esta descansado.
+</details>
+
+### Ensamblado
 
 ### Operacion
+
+
