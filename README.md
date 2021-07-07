@@ -99,30 +99,30 @@ Por ultimo, la Universidad nos provio de las siguientes librerias para operar el
 
 ### Librerias
 
+<blockquote>
 <details>
-<summary markdown='span'/><b>common_stuff.h</b></summary>
-      
-Presenta funciones, enumeraciones, y estructuras de uso comun para todo el programa.
-* Funciones:
-  * `char* ConvertColorCategoryToChar(ColorCategory)`: Convierte un dato ColorCategory a c-string.
-  * `char* ConvertRGBColorToChar(RGBColor)`: Convierte un dato RGBColor a c-string.
-* Clases:
-  *  `ButtonState()`: Maneja el estado de una boton asociado a un pin usando attach(int pin, int debounce_delay);
-* Enumeraciones:
-  * `MenuUserActions`: Botones disponibles.
-  * `RotationDirection`: A reloj o contra. Para el paso a paso.
-  * `ButtonAction`: Estado de un boton.
-  * `TextAlignment`: Justificacion para textos.
-  * `SensorAuxLEDMode`: Modo de operacion del LED del sensor.
-  * `RGBColors`: Colores para LEDs RGB.
-  * `SorterActions`: Acciones individuales del sistema.
-  * `SorterPrograms`: Programas de operacion que se pueden ejecutar.
-  * `ColorCategories`: Categorias de colores a clasificar.
-  * `MenuActions`: Acciones disponibles para el boton 'entrar' en el menu.
-<br>
+<summary markdown="span"><b>common_stuff.h</b></summary>
+
+  Presenta funciones, enumeraciones, y estructuras de uso comun para todo el programa.
+  * Funciones:
+    * `char* ConvertColorCategoryToChar(ColorCategory)`: Convierte un dato ColorCategory a c-string.
+    * `char* ConvertRGBColorToChar(RGBColor)`: Convierte un dato RGBColor a c-string.
+  * Clases:
+    *  `ButtonState()`: Maneja el estado de una boton asociado a un pin usando attach(int pin, int debounce_delay);
+  * Enumeraciones:
+    * `MenuUserActions`: Botones disponibles.
+    * `RotationDirection`: A reloj o contra. Para el paso a paso.
+    * `ButtonAction`: Estado de un boton.
+    * `TextAlignment`: Justificacion para textos.
+    * `SensorAuxLEDMode`: Modo de operacion del LED del sensor.
+    * `RGBColors`: Colores para LEDs RGB.
+    * `SorterActions`: Acciones individuales del sistema.
+    * `SorterPrograms`: Programas de operacion que se pueden ejecutar.
+    * `ColorCategories`: Categorias de colores a clasificar.
+    * `MenuActions`: Acciones disponibles para el boton 'entrar' en el menu.
 </details>
 <details>
-<summary markdown='span'/><b>stepper_control.h</b></summary>
+<summary><b>stepper_control.h</b></summary>
       
 Definicion de clases asociadas al motor paso a paso.
 * Clases:
@@ -136,10 +136,9 @@ Definicion de clases asociadas al motor paso a paso.
     * `isBusy()`: Devuelve verdadero si el estado actual es de descanzo.
 * Enumeraciones:
   * `StepperActions`: Operaciones que puede realizar el motor paso a paso.
-<br>
 </details>
 <details>
-<summary markdown='span'/><b>simple_output_control.h</b></summary>
+<summary><b>simple_output_control.h</b></summary>
       
 Operacion de digital outputs.
 * Clase:
@@ -148,20 +147,18 @@ Operacion de digital outputs.
     * `processState()`: Activa o desactiva el pin segun el estado dle objeto.
     * `on()`: Cambia el estado a HIGH.
     * `off()`: Cambia el estado a LOW.
-<br>
 </details>
 <details>
-<summary markdown='span'/><b>servo_control.h</b></summary>
+<summary><b>servo_control.h</b></summary>
 
 Operacion del servo motor.
 * Clase:
   * `ServoControl(int)`: Operacion del servomotor, e inicializacion.
     * `initialize()`: Inicializacion del objeto servo.
     * `moveToColor(ColorCategory)`: A partir de color category, mover servo.
-<br>
 </details>
 <details>
-<summary markdown='span'/><b>rgb_control.h</b></summary>
+<summary><b>rgb_control.h</b></summary>
       
 Activacion y manejo de LEDs RGB.
 * Clase:
@@ -170,10 +167,9 @@ Activacion y manejo de LEDs RGB.
     * `processState()`: Opera el LED segun el estado de este.
     * `setColor()` : Cambia el estado del LED.
     * `isRested()`: Devuelve verdadero si el led esta descansando.
-<br>
 </details>
 <details>
-<summary markdown='span'/><b>display_control.h</b></summary>
+<summary><b>display_control.h</b></summary>
  
 Operacion de Displays LCD por I2C.
 * Clases:
@@ -187,6 +183,52 @@ Operacion de Displays LCD por I2C.
     * `noNavArrows()`: Ocultar flechas de navegacion en la linea inferior.
     * `rested()`: Devuelve verdadero si el display esta descansado.
 </details>
+<details>
+<summary><b>sensor_control.h</b></summary>
+ 
+Operacion del sensor RGB, y acceso a lecturas.
+* Clases:
+  * `SensorControl(int)`: Clase que inicializa y interactua con el sensor.
+    * `initialize()`: Inicializa el objeto sensor y crea chars especiales.
+    * `processState()`: Opera el sensor y LED segun el estado.
+    * `setAuxLEDMode(SensorAuxLEDMode)`: Cambia el estado del LED.
+    * `isBusy()`: Devuelve true si el sensor esta operando.
+    * `getColorRead()`: Devuelva la ColorCategory asociada al color leido.
+    * `getColorReadRGB()`: Devuelve un RGBColor con los datos leidos.
+    * `requestColorReading()`: Cambia el estado del sensor para realizar una lectura.
+</details>
+<details>
+<summary><b>sorter_control.h</b></summary>
+ 
+Ejecucion de Programas de automatizacion, rastreo de estadistica, y interfaz con otras librerias.
+* Clases:
+  * `SorterControl(SensorControl (&), StepperControl (&), ServoControl (&), SOutputControl (&), RGBControl (&), DisplayControl (&))`: Clase que hace de interfaz entre el menu y los componentes, y ejecuta programas.
+    * `initialize()`: Llama al inicializador de todos los objetos para componentes.
+    * `processState()`: Ejecuta pogramas segun el estado.
+    * `startProgram()`: Inicia un programa de ejecucion.
+    * `stopProgram()`: Levanta el flag que los programas no bloqueantes toman para parar.
+    * `isBusy()`: Devuelve true si se esta ejecutanto algun programa.
+</details>
+<details>
+<summary><b>menu_control.h</b></summary>
+ 
+Presenta un menu por display al usuario y le permite interactuar con la clasificadora por medio de una botonera.
+* Clases:
+  * `MenuControl(const MenuItemS (&)[38], DisplayControl (&), SorterControl (&))`: Maneja interacciones entre clasificadora e usuario por botonera y display
+    * `initialize()`: Inicializa el objeto SorterControl.
+    * `processState()`: Dependiendo de la accion activa, navega el menu o actuva programas del SorterControl.
+    * `triggerUserAction(MenuUserActions)`: Cambia el estado configurando la accion activa por la recivida.
+    * `getCurrentAction()`: Devuelve la accion activa.
+    * `getCurrentMenuItemId()`: Devuelve el id del item de menu actual.
+    * `getMenuItem()`: Devuelve el item de menu para dado id.
+    * `getNextSiblingId()`: Devuelve el id del item de menu hermano siguiente desde el item de menu actual.
+    * `getPrevSiblingId()`: Devuelve el id del item de menu hermano anterior desde el item de menu actual.
+    * `getSiblingCount()`: Devuelve la cantidad de hermanos para el item de menu actual.
+    * `getFirstChild()`: Devuelve el id del item de menu con indice 0 dentro de los hijos del item de menu actual.
+    * `inactive()`: Devuelve verdadero si el menu se encuentra inactivo.
+    * `canGoBack()`: Devuelve verdadero si existe abuelo del item del menu actual.
+</details>
+</blockquote>
 
 ### Ensamblado
 
