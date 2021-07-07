@@ -7,7 +7,7 @@
 #include "sensor_control.h"
 #include "servo_control.h"
 #include "stepper_control.h"
-#include "relay_control.h"
+#include "simple_output_control.h"
 #include "rgb_control.h"
 #include "display_control.h"
 #include "menu_control.h"
@@ -94,10 +94,10 @@ ButtonState buttonEnter;
 SensorControl sensorControl(PIN_SENSOR_AUX_LED);
 StepperControl stepperControl(PIN_STEPPER_IN1, PIN_STEPPER_IN2, PIN_STEPPER_IN3, PIN_STEPPER_IN4);
 ServoControl servoControl(PIN_SERVO_SIGNAL);
-RelayControl relayControl(PIN_RELAY_SIGNAL);
+SOutputControl sOutputControl(PIN_RELAY_SIGNAL);
 RGBControl rgbControl(PIN_RGB_LED_RED, PIN_RGB_LED_GRE, PIN_RGB_LED_BLU);
 DisplayControl displayControl(DISPLAY_ADDRESS, DISPLAY_COLUMNS, DISPLAY_ROWS, REST_DELAY);
-SorterControl sorterControl(sensorControl, stepperControl, servoControl, relayControl, rgbControl, displayControl);
+SorterControl sorterControl(sensorControl, stepperControl, servoControl, sOutputControl, rgbControl, displayControl);
 MenuControl menuControl(menu2, displayControl, sorterControl);
 
 void setup() {
@@ -114,7 +114,7 @@ void setup() {
 void loop() {
     sensorControl.processState();
     stepperControl.processState();
-    relayControl.processState();
+    sOutputDisplay.processState();
     rgbControl.processState();
     displayControl.processState();
     sorterControl.processState();
@@ -129,5 +129,4 @@ void loop() {
     if (buttonNext.getUserAction() == ButtonAction::Release) menuControl.triggerUserAction(MenuUserActions::Next);
     if (buttonReturn.getUserAction() == ButtonAction::Release) menuControl.triggerUserAction(MenuUserActions::Return);
     if (buttonEnter.getUserAction() == ButtonAction::Release) menuControl.triggerUserAction(MenuUserActions::Enter);
-    //if (buttonEnter.getUserAction() == ButtonAction::Hold) digitalWrite(6, HIGH);
 }

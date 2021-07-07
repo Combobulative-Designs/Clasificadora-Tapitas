@@ -2,7 +2,7 @@
 #include "sensor_control.h"
 #include "servo_control.h"
 #include "stepper_control.h"
-#include "relay_control.h"
+#include "simple_output_control.h"
 #include "rgb_control.h"
 #include "display_control.h"
 //#include "encoder_control.h"
@@ -12,7 +12,7 @@
 
 class SorterControl {
 public:
-    SorterControl(SensorControl (&), StepperControl (&), ServoControl (&), RelayControl (&), RGBControl (&), DisplayControl (&));
+    SorterControl(SensorControl (&), StepperControl (&), ServoControl (&), SOutputControl (&), RGBControl (&), DisplayControl (&));
 
     void processState();
     void initialize();
@@ -25,7 +25,7 @@ private:
     SensorControl &sensorControl;
     StepperControl &stepperControl;
     ServoControl &servoControl;
-    RelayControl &relayControl;
+    SOutputControl &sOutputControl;
     RGBControl &rgbControl;
     DisplayControl &displayControl;
 

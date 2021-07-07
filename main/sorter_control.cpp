@@ -13,14 +13,14 @@
 SorterControl::SorterControl(SensorControl &p_sensorControl,
                              StepperControl &p_stepperControl,
                              ServoControl &p_servoControl,
-                             RelayControl &p_relayControl,
+                             SOutputControl &p_sOutputControl,
                              RGBControl &p_rgbControl,
                              DisplayControl &p_displayControl
                              ) :
                              sensorControl(p_sensorControl),
                              stepperControl(p_stepperControl),
                              servoControl(p_servoControl),
-                             relayControl(p_relayControl),
+                             sOutputControl(p_sOutputControl),
                              rgbControl(p_rgbControl),
                              displayControl(p_displayControl),
                              initialized(false),
@@ -38,7 +38,7 @@ void SorterControl::initialize() {
         sensorControl.initialize();
         stepperControl.initialize();
         servoControl.initialize();
-        relayControl.initialize();
+        sOutputControl.initialize();
         rgbControl.initialize();
         displayControl.initialize();
 
@@ -318,7 +318,7 @@ void SorterControl::PGM_Automatic() {
         switch (currentProgramStep) {
             case 1:
                 locked = false;
-                relayControl.on();
+                sOutputControl.on();
                 programStartTime = millis();
                 currentProgramStep++;
                 break;
@@ -393,7 +393,7 @@ void SorterControl::PGM_Automatic() {
                 if (stopSignal) {
                     currentProgram = SorterPrograms::Rest;
                     currentProgramStep = 99;
-                    relayControl.off();
+                    sOutputControl.off();
                     stopSignal = false;
                 } else {
                     currentProgramStep = 3;

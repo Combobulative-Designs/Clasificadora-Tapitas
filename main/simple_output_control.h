@@ -1,11 +1,11 @@
 #include <Arduino.h>
 
-#ifndef GITHUB_REPO_RELAY_CONTROL_H
-#define GITHUB_REPO_RELAY_CONTROL_H
+#ifndef GITHUB_REPO_SIMPLE_OUTPUT_CONTROL_H
+#define GITHUB_REPO_SIMPLE_OUTPUT_CONTROL_H
 
-class RelayControl {
+class SOutputControl {
 public:
-    RelayControl(int p_pin_signal);
+    SOutputControl(int p_pin_signal);
 
     void processState();
     void initialize();
@@ -19,4 +19,4 @@ private:
     int currentState;
 };
 
-#endif //GITHUB_REPO_RELAY_CONTROL_H
+#endif //GITHUB_REPO_SIMPLE_OUTPUT_CONTROL_H
