@@ -116,7 +116,21 @@ Por ultimo, la Universidad nos provio de las siguientes librerias para operar el
     * `SorterPrograms`: Programas de operacion que se pueden ejecutar.
     * `ColorCategories`: Categorias de colores a clasificar.
     * `MenuActions`: Acciones disponibles para el boton 'entrar' en el menu.
-    * 
+
+* `stepper_control.h`: Definicion de clases asociadas al motor paso a paso.
+  * Clases:
+    * `StepperControl(int, int, int, int)`: Controla e inicializa el motor.
+    * `initialize()`: Inicializa el motor con maxima velocidad en 500 y posicion 0.
+    * `processState()`: Opera el motor segun el estado del objecto.
+    * `doCycling()`: Cambia el estado para realizar el ciclaje continuo del motor.
+    * `doCapStep()`: Cambia el estado para realizar un giro de 30º.
+    * `stopActions()`: Cambia el estado para detener todas las acciones.
+    * `getCurrentAction()`: Devuelve la accion actual.
+    * 'isBusy()': Devuelve verdadero si el estado actual es de descanzo.
+  * Enumeraciones:
+    * `StepperActions`: Operaciones que puede realizar el motor paso a paso.
+
+
 ### Ensamblado
 
 ### Operacion
