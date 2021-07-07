@@ -147,12 +147,26 @@ Por ultimo, la Universidad nos provio de las siguientes librerias para operar el
 * `rgb_control.h`: Activacion y manejo de LEDs RGB.
   * Clase:
     * `RGBControl(int, int, int)`: 
-      * `processState()`: Opera el LED segun el estado de este.
       * `initialize()`: Configura valores por defecto.
+      * `processState()`: Opera el LED segun el estado de este.
       * `setColor()` : Cambia el estado del LED.
       * `isRested()`: Devuelve verdadero si el led esta descansando.
 
 * `display_control.h`: Operacion de Displays LCD por I2C.
+  * Clases:
+    * `TextLine()`: Guarda una linea del display y expone metodos para usarla.
+      * `generateVisibleLine(int)`: Aplica alineacion y largo de cadena.
+    * `DisplayControl(byte, int, int, int)`: Operacion del display LCD I2C.
+      * `initialize()`: Inicializa el objeto display y crea chars especiales.
+      * `processState()`: Opera el display de acuerdo a cambios de estado.
+      * `setLineText(char [], int, enum TextAlignment)`: Cmabia el estado y conifugra una linea.
+      * `navArrows()`: Mostrar flechas de navegacion en la linea inferior.
+      * `noNavArrows()`: Ocultar flechas de navegacion en la linea inferior.
+      * `rested()`: Devuelve verdadero si el display esta descansado.
+
+* 
+
+* ``
 
 ### Ensamblado
 
