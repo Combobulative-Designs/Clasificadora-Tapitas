@@ -120,15 +120,23 @@ Por ultimo, la Universidad nos provio de las siguientes librerias para operar el
 * `stepper_control.h`: Definicion de clases asociadas al motor paso a paso.
   * Clases:
     * `StepperControl(int, int, int, int)`: Controla e inicializa el motor.
-    * `initialize()`: Inicializa el motor con maxima velocidad en 500 y posicion 0.
-    * `processState()`: Opera el motor segun el estado del objecto.
-    * `doCycling()`: Cambia el estado para realizar el ciclaje continuo del motor.
-    * `doCapStep()`: Cambia el estado para realizar un giro de 30º.
-    * `stopActions()`: Cambia el estado para detener todas las acciones.
-    * `getCurrentAction()`: Devuelve la accion actual.
-    * 'isBusy()': Devuelve verdadero si el estado actual es de descanzo.
+      * `initialize()`: Inicializa el motor con maxima velocidad en 500 y posicion 0.
+      * `processState()`: Opera el motor segun el estado del objecto.
+      * `doCycling()`: Cambia el estado para realizar el ciclaje continuo del motor.
+      * `doCapStep()`: Cambia el estado para realizar un giro de 30º.
+      * `stopActions()`: Cambia el estado para detener todas las acciones.
+      * `getCurrentAction()`: Devuelve la accion actual.
+      * 'isBusy()': Devuelve verdadero si el estado actual es de descanzo.
   * Enumeraciones:
     * `StepperActions`: Operaciones que puede realizar el motor paso a paso.
+
+* `simple_output_control.h`: Operacion de digital outputs.
+  * Clase:
+    * `SOutputControl(int)`: Definicion, inicializacion, y operacion de digtal outputs.
+      * `initialize()`: Inicializa la salida en el pin y lo configura.
+      * `processState()`: Activa o desactiva el pin segun el estado dle objeto.
+      * `on()`: Cambia el estado a HIGH.
+      * `off()`: Cambia el estado a LOW.
 
 
 ### Ensamblado
