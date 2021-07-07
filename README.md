@@ -126,7 +126,7 @@ Por ultimo, la Universidad nos provio de las siguientes librerias para operar el
       * `doCapStep()`: Cambia el estado para realizar un giro de 30º.
       * `stopActions()`: Cambia el estado para detener todas las acciones.
       * `getCurrentAction()`: Devuelve la accion actual.
-      * 'isBusy()': Devuelve verdadero si el estado actual es de descanzo.
+      * `isBusy()`: Devuelve verdadero si el estado actual es de descanzo.
   * Enumeraciones:
     * `StepperActions`: Operaciones que puede realizar el motor paso a paso.
 
@@ -138,6 +138,21 @@ Por ultimo, la Universidad nos provio de las siguientes librerias para operar el
       * `on()`: Cambia el estado a HIGH.
       * `off()`: Cambia el estado a LOW.
 
+* `servo_control.h`: Operacion del servo motor.
+  * Clase:
+    * `ServoControl(int)`: Operacion del servomotor, e inicializacion.
+      * `initialize()`: Inicializacion del objeto servo.
+      * `moveToColor(ColorCategory)`: A partir de color category, mover servo.
+      
+* `rgb_control.h`: Activacion y manejo de LEDs RGB.
+  * Clase:
+    * `RGBControl(int, int, int)`: 
+      * `processState()`: Opera el LED segun el estado de este.
+      * `initialize()`: Configura valores por defecto.
+      * `setColor()` : Cambia el estado del LED.
+      * `isRested()`: Devuelve verdadero si el led esta descansando.
+
+* `display_control.h`: Operacion de Displays LCD por I2C.
 
 ### Ensamblado
 
