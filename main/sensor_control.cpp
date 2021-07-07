@@ -130,13 +130,7 @@ void SensorControl::readColor() {
             }
         }
         colorRead = (enum ColorCategory)index;
-        Serial.print((((float)colorReadRGB.red / colorReadRGB.white) * 255.0), DEC);
-        Serial.print(" - ");
-        Serial.print((((float)colorReadRGB.blue / colorReadRGB.white) * 255.0), DEC);
-        Serial.print(" - ");
-        Serial.print((((float)colorReadRGB.green / colorReadRGB.white) * 255.0), DEC);
-        Serial.print(" - ");
-        Serial.println(colorReadRGB.white, DEC);
+
     }
 
 

@@ -525,7 +525,32 @@ void SorterControl::PGM_SensorData() {
                 if (!sensorControl.isBusy()) {
                     colorCategoryRead = sensorControl.getColorRead();
                     RGBColor colorRGBRead = sensorControl.getColorReadRGB();
-                    displayControl.setLineText((char*)"Detectado\0\0\0\0\0\0\0\0\0\0", 0, TextAlignment::Center);
+                    RGBColorNorm rgbNorm = NormalizeRGBColor(colorRGBRead);
+                    char rgbStr[20];
+                    char channelStr[3];
+                    itoa(rgbNorm.red, channelStr, 10);
+                    for (int i = 0; i < 3; i++) {
+                        rgbStr[i] = channelStr[i];
+                    }
+                    rgbStr[strlen(rgbStr)] = ',';
+                    itoa(rgbNorm.blue, channelStr, 10);
+                    for (int i = 0; i < 3; i++) {
+                        rgbStr[i+strlen(rgbStr)] = channelStr[i];
+                    }
+                    rgbStr[strlen(rgbStr)] = ',';
+                    itoa(rgbNorm.green, channelStr, 10);
+                    for (int i = 0; i < 3; i++) {
+                        rgbStr[i+strlen(rgbStr)] = channelStr[i];
+                    }
+                    for (int i = strlen(rgbStr); i < 20; ++i) {
+                        rgbStr[i] = '\0';
+                    }
+                    displayControl.setLineText(rgbStr, 0, TextAlignment::Center);
+
+
+
+
+
                     displayControl.setLineText(ConvertRGBColorToChar(colorRGBRead), 1, TextAlignment::Center);
                     currentProgramStep++;
                 }

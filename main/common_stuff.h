@@ -65,6 +65,12 @@ typedef struct {
     uint16_t green;
 } RGBColor;
 
+typedef struct {
+    uint8_t red;
+    uint8_t blue;
+    uint8_t green;
+} RGBColorNorm;
+
 class ButtonState {
 public:
     ButtonState();
@@ -85,6 +91,7 @@ private:
     int debounceDelay;
 };
 
+RGBColorNorm NormalizeRGBColor(RGBColor rgbColor);
 char* ConvertColorCategoryToChar(ColorCategory category);
 char* ConvertRGBColorToChar(RGBColor rgbColor);
 

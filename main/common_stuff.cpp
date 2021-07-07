@@ -44,6 +44,16 @@ void ButtonState::processState() {
 ButtonAction ButtonState::getUserAction() {return userAction;}
 bool ButtonState::debounced() {return (lastReading + debounceDelay <= millis());}
 
+RGBColorNorm NormalizeRGBColor(RGBColor rgbColor) {
+    RGBColorNorm rgbNorm;
+
+    rgbNorm.red = (int)(((float)rgbColor.red / rgbColor.white) * 255.0);
+    rgbNorm.blue = (int)(((float)rgbColor.blue / rgbColor.white) * 255.0);
+    rgbNorm.green = (int)(((float)rgbColor.green / rgbColor.white) * 255.0);
+
+    return rgbNorm;
+};
+
 char* ConvertColorCategoryToChar(ColorCategory p_category) {
     switch (p_category) {
         case ColorCategory::Reds:
