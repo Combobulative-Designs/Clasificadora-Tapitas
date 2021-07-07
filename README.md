@@ -33,7 +33,7 @@ medidas se especifico un grosor de 3mm para todas las placas y laminas.
 
 ### Piezas 3D
 
-### Cortes en MDF
+### Placas
 
 ### Componentes
 
@@ -47,7 +47,6 @@ mas otros adicionales obtenidos individualmente por el equipo. Entre estos se en
 - Resistencia de 200 Ohm x 1
 - Resistencia de 1M Ohm x 1
 - LED RGD x 1
-- LED Blanco x 1
 - Buzzer x 1
 - Sensor de color TCS34725 x 1
 - Pantalla LCD de 1602 + Modulo I2C x 1
@@ -56,6 +55,9 @@ mas otros adicionales obtenidos individualmente por el equipo. Entre estos se en
 - Codificador rotatorio KY-040 x 1
 - Relay de 5V con 1 canal x 1
 - Motor DC de 3V x 4
+- Placa de PCB x 1
+- Switch de 2 posiciones x 1
+- Modulo de reduccion CC-CC (Convertidor XL7015 V2 DC-DC)
 - Transformador 220AC a 12V 2A x 1
 
 Y muchos cablecitos.
@@ -74,13 +76,14 @@ cual referenciar luego desde el sketch principal.
 
 Las librerias desarrolladas fueron:
 - common_stuff (Funciones, enumerables, clases, y etc. en comun para todo el programa)
-- sensor_dummy (control del sensor de color)
+- sensor_control (control del sensor de color)
 - stepper_control (control del motor paso a paso)
 - servo_control (control del micro servo motor)
-- encoder_control (control del codificador rotatorio)
+- rgb_control (control de LEDs RGB)
+- simple_output_control (control de estado para pines de salida, usado para leds, reles, y buzzers)
 - display_control (control del display LCD)
 - menu_control (control del menu del programa)
-- auto_control (control del script de clasificacion automatica e interface entre el menu y los componentes)
+- sorter_control (control del script de clasificacion automatica e interface entre el menu y los componentes)
 
 Adicionalmente se utilizaron las librerias de 3er siguientes:
 - AccelStepper
@@ -96,6 +99,26 @@ Por ultimo, la Universidad nos provio de las siguientes librerias para operar el
 
 ### Librerias
 
-### Ensablado
+* `common_stuff.h`: Presenta funciones, enumeraciones, y estructuras de uso comun para todo el programa.
+  * Funciones:
+    * `char* ConvertColorCategoryToChar(ColorCategory)`: Convierte un dato ColorCategory a c-string.
+    * `char* ConvertRGBColorToChar(RGBColor)`: Convierte un dato RGBColor a c-string.
+  * Clases:
+    *  `ButtonState()`: Maneja el estado de una boton asociado a un pin usando attach(int pin, int debounce_delay);
+  * Enumeraciones:
+    * `MenuUserActions`: Botones disponibles.
+    * `RotationDirection`: A reloj o contra. Para el paso a paso.
+    * `ButtonAction`: Estado de un boton.
+    * `TextAlignment`: Justificacion para textos.
+    * `SensorAuxLEDMode`: Modo de operacion del LED del sensor.
+    * `RGBColors`: Colores para LEDs RGB.
+    * `SorterActions`: Acciones individuales del sistema.
+    * `SorterPrograms`: Programas de operacion que se pueden ejecutar.
+    * `ColorCategories`: Categorias de colores a clasificar.
+    * `MenuActions`: Acciones disponibles para el boton 'entrar' en el menu.
+    * 
+### Ensamblado
 
 ### Operacion
+
+
