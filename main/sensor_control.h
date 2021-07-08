@@ -6,16 +6,6 @@
 #ifndef CLASIFICADORA_TI3_SENSOR_CONTROL_H
 #define CLASIFICADORA_TI3_SENSOR_CONTROL_H
 
-const int previousSamples[7][3] = {
-        {2062, 1469,  861},
-        {1735,  758,  502},
-        {1148,  440,  415},
-        {1226,  478,  520},
-        { 907,  580,  620},
-        {1837, 1529, 1437},
-        { 825,  821,  971}
-};
-
 class SensorControl {
 public:
     SensorControl(int p_pin_aux_led);
@@ -25,8 +15,10 @@ public:
 
     void setAuxLEDMode(enum SensorAuxLEDMode);
     bool isBusy();
-    enum ColorCategory getColorRead();
+
     RGBColor getColorReadRGB();
+    int getNearestSampleIndex();
+
     void requestColorReading();
 
 private:
@@ -42,7 +34,9 @@ private:
     unsigned long lastActivity;
     bool queuedReadAction;
 
+    double calcColorDistance(RGBColorNorm, RGBColorNorm);
     void readColor();
+    void readColorRGB();
 };
 
 #endif //CLASIFICADORA_TI3_SENSOR_CONTROL_H

@@ -1,6 +1,8 @@
 #include <Arduino.h>
 
 #include "common_stuff.h"
+#include "PROGMEM_readAnything.h"
+#include "progmem_data.h"
 
 ButtonState::ButtonState() :
         pinButton(0),
@@ -29,10 +31,8 @@ void ButtonState::processState() {
             userAction = ButtonAction::Press;
         } else if (newState == HIGH && state == HIGH) {
             userAction = ButtonAction::Hold;
-            //cyclesHeld += 1;
         } else if (newState == LOW && state == HIGH) {
             userAction = ButtonAction::Release;
-            //cyclesHeld = 0;
         } else if (newState == LOW && state == LOW) {
             userAction = ButtonAction::Rest;
         }
@@ -48,8 +48,8 @@ RGBColorNorm NormalizeRGBColor(RGBColor rgbColor) {
     RGBColorNorm rgbNorm;
 
     rgbNorm.red = (int)(((float)rgbColor.red / rgbColor.white) * 255.0);
-    rgbNorm.blue = (int)(((float)rgbColor.blue / rgbColor.white) * 255.0);
     rgbNorm.green = (int)(((float)rgbColor.green / rgbColor.white) * 255.0);
+    rgbNorm.blue = (int)(((float)rgbColor.blue / rgbColor.white) * 255.0);
 
     return rgbNorm;
 }
@@ -73,25 +73,24 @@ char* ConvertColorCategoryToChar(ColorCategory p_category) {
     }
 }
 
-char* ConvertRGBColorToChar(RGBColor rgbColor, char* rgbNormStr) { 
-    RGBColorNorm rgbNorm = NormalizeRGBColor(rgbColor);
-    
-    for (int i = 0; i < 20; i++) {
+void ConvertRGBColorNormToChar(RGBColorNorm rgbNorm, char* rgbNormStr) {
+    for (int i = 0; i < 12; i++) {
       rgbNormStr[i] = '\0';
     }
-    char channelStr[3];
+    
+    char channelStr[5];
     itoa(rgbNorm.red, channelStr, 10);
-    for (int i = 0; i < (log10(rgbNorm.red) + 1); i++) {
-        rgbNormStr[i] = channelStr[i];
-    }
-    rgbNormStr[strlen(rgbNormStr)] = ',';
-    itoa(rgbNorm.blue, channelStr, 10);
-    for (int i = 0; i < (log10(rgbNorm.blue) + 1); i++) {
-        rgbNormStr[i+strlen(rgbNormStr)] = channelStr[i];
-    }
-    rgbNormStr[strlen(rgbNormStr)] = ',';
+    strcat(rgbNormStr, channelStr);
+    strcat(rgbNormStr, (char *)",");
     itoa(rgbNorm.green, channelStr, 10);
-    for (int i = 0; i < (log10(rgbNorm.green) + 1); i++) {
-        rgbNormStr[i+strlen(rgbNormStr)] = channelStr[i];
-    }
+    strcat(rgbNormStr, channelStr);
+    strcat(rgbNormStr, (char *)",");
+    itoa(rgbNorm.blue, channelStr, 10);
+    strcat(rgbNormStr, channelStr);
+}
+
+void ConvertRGBSampleIndexToName(int sampleIndex, char* rgbName) {
+    char rgbName11[11];
+    PROGMEM_readAnything (&sampleNames [sampleIndex], rgbName11);
+    rgbName = (char*)rgbName11;
 };

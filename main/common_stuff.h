@@ -59,16 +59,16 @@ enum class MenuActions {
 };
 
 typedef struct {
-    uint16_t white;
-    uint16_t red;
-    uint16_t blue;
-    uint16_t green;
+    int white;
+    int red;
+    int green;
+    int blue;
 } RGBColor;
 
 typedef struct {
-    uint8_t red;
-    uint8_t blue;
-    uint8_t green;
+    int red;
+    int green;
+    int blue;
 } RGBColorNorm;
 
 class ButtonState {
@@ -91,8 +91,9 @@ private:
     int debounceDelay;
 };
 
-RGBColorNorm NormalizeRGBColor(RGBColor rgbColor);
-char* ConvertColorCategoryToChar(ColorCategory category);
-char* ConvertRGBColorToChar(RGBColor rgbColor, char*);
+RGBColorNorm NormalizeRGBColor(RGBColor);
+char* ConvertColorCategoryToChar(ColorCategory);
+void ConvertRGBColorNormToChar(RGBColorNorm, char*);
+void ConvertRGBSampleIndexToName(int, char*);
 
 #endif //CLASIFICADORA_COMMON_STUFF_H

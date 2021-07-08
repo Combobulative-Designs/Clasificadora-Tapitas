@@ -2,6 +2,8 @@
 #include "Adafruit_TCS34725.h"
 
 #include "common_stuff.h"
+#include "progmem_data.h"
+#include "PROGMEM_readAnything.h"
 
 #include "sensor_control.h"
 
@@ -45,10 +47,6 @@ bool SensorControl::isBusy() {
     } else {
         return false;
     }
-}
-
-enum ColorCategory SensorControl::getColorRead() {
-    return colorRead;
 }
 
 RGBColor SensorControl::getColorReadRGB() {
@@ -117,53 +115,37 @@ void SensorControl::readColor() {
         colorReadRGB.red = sensor.read16(TCS34725_RDATAL);
         colorReadRGB.green = sensor.read16(TCS34725_GDATAL);
         colorReadRGB.blue = sensor.read16(TCS34725_BDATAL);
+    }
+}
 
-        int distance;
-        int minDistance = 999;
-        int index;
+int SensorControl::getNearestSampleIndex() {
+    if (initialized) {
+        RGBColorNorm rgbColorNorm = NormalizeRGBColor(colorReadRGB);
+        int colorDistMin = 9999;
+        int colorDist;
+        int closestSampleIndex;
 
-        for (byte i = 0; i < 7; ++i) {
-            distance = sqrt(pow(colorReadRGB.red - previousSamples[i][0], 2) + pow(colorReadRGB.green - previousSamples[i][1], 2) + pow(colorReadRGB.blue - previousSamples[i][2], 2));
-            if (distance < minDistance) {
-                index = i;
-                minDistance = distance;
+        for (int i = 0; i < 11; i++) {
+            RGBColorNorm sample = {0,0,0};
+            PROGMEM_readAnything (&samples [i], sample);
+            colorDist = calcColorDistance(rgbColorNorm, sample);
+            if (colorDist < colorDistMin) {
+                closestSampleIndex = i;
+                colorDistMin = colorDist;
             }
         }
-        colorRead = (enum ColorCategory)index;
 
-    }
-
-
-
-
-
-
-
-
-
-/*
-    colorReadRGB = COLOR_getRGB()
-    HSL_t colorHSL = COLOR_getHSLfromRGB(COLOR_getRGB());
-
-    if (colorHSL.luminosity >= LUMINOSITY_MIN_BLANCO && colorHSL.saturation < SATURATION_MAX_BLANCO) {
-        colorRead = ColorCategory::Whites;
-    } else if (colorHSL.luminosity < LUMINOSITY_MAX_NEGRO && colorHSL.saturation < SATURATION_MAX_NEGRO) {
-        colorRead = ColorCategory::Blacks;
-    } else if (colorHSL.luminosity < LUMINOSITY_MAX_GRIS && colorHSL.saturation < SATURATION_MAX_GRIS) {
-        colorRead = ColorCategory::Greys;
+        return closestSampleIndex;
     } else {
-        if (colorHSL.hue < MAX_HUE_ROJO) {
-            colorRead = ColorCategory::Reds;
-        } else if (colorHSL.hue < MAX_HUE_NARANJA) {
-            colorRead = ColorCategory::Reds;
-        } else if (colorHSL.hue < MAX_HUE_AMARILLO) {
-            colorRead = ColorCategory::Yellows;
-        } else if (colorHSL.hue < MAX_HUE_VERDE) {
-            colorRead = ColorCategory::Greens;
-        } else if (colorHSL.hue < MAX_HUE_AZUL) {
-            colorRead = ColorCategory::Blues;
-        } else {
-            colorRead = ColorCategory::Reds;
-        }
-    }*/
+        return 0;
+    }
+}
+
+double SensorControl::calcColorDistance(RGBColorNorm reading, RGBColorNorm sample) {
+    //return sqrt(pow(reading.red - sample.red, 2) + pow(reading.green - sample.green, 2) + pow(reading.blue - sample.blue, 2));
+    long rmean = ( (long)reading.red + (long)sample.red ) / 2;
+    long r = (long)reading.red - (long)sample.red;
+    long g = (long)reading.green - (long)sample.green;
+    long b = (long)reading.blue - (long)sample.blue;
+    return sqrt((((512+rmean)*r*r)>>8) + 4*g*g + (((767-rmean)*b*b)>>8));
 }

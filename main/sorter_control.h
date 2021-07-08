@@ -38,6 +38,9 @@ private:
     int currentProgramStep;
     unsigned long programStartTime;
     enum ColorCategory colorCategoryRead;
+    RGBColorNorm colorRGBRead;
+    RGBColorNorm samplesForAvg[10];
+    int avgIndex;
     unsigned long autoOperationTime;
     int processedTotal;
     int processedByColor[7];
@@ -53,6 +56,7 @@ private:
 
     void PGM_CycleStepper();
     void PGM_SensorData();
+    void PGM_SensorAvg();
 };
 
 #endif //GITHUB_REPO_SORTER_CONTROL_H
