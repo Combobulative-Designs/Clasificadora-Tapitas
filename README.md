@@ -106,6 +106,12 @@ El menu es el que procesa estas acciones e interactua con los objetos displayCon
 de la memoria dinamica del Arduino UNO, toda la estructura del menu fue guardada en la memoria del programa. De lo
 contrario, el array con los datos ocuparia mas del 100% de la memoria por si solo.
 
+Para la deteccion del color se considero un algoritmo el cual acepta los valores RGB detectados dentro de un rango de
+0 a 255 como si fueran puntos en un espacio de tres dimenciones, y calcula la distancia euclideana entre este valor y
+varios otros ya conocidos. Pero se termino utilizando otro cuyo resultado se aproxima a la distancia euclideana en un espacio
+de colores L*u*v*. El concepto es el mismo pero dentro de otro espacio de colores. Un espacio el cual fue diseñado 
+especificamente para la uniformidad perceptual.
+
 ### Librerias
 
 <blockquote>
@@ -254,5 +260,8 @@ Por ultimo, la Universidad nos provio de las siguientes librerias para operar el
 ### Ensamblado
 
 ### Operacion
+
+### Fuentes usadas
+
 
 
