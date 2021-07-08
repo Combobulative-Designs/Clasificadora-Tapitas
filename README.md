@@ -44,15 +44,12 @@ mas otros adicionales obtenidos individualmente por el equipo. Entre estos se en
 - Protoboard/Breadboard
 - Switch tactil x 4
 - Resistencia de 10K Ohm x 4
-- Resistencia de 200 Ohm x 1
-- Resistencia de 1M Ohm x 1
+- Resistencia de 200 Ohm x 3
 - LED RGD x 1
-- Buzzer x 1
 - Sensor de color TCS34725 x 1
 - Pantalla LCD de 1602 + Modulo I2C x 1
 - Micro Servomotor SG90 x 1
 - Motor Paso a Paso 28byj-48 + Driver ULN2003 x 1
-- Codificador rotatorio KY-040 x 1
 - Relay de 5V con 1 canal x 1
 - Motor DC de 3V x 4
 - Placa de PCB x 1
@@ -85,17 +82,29 @@ Las librerias desarrolladas fueron:
 - menu_control (control del menu del programa)
 - sorter_control (control del script de clasificacion automatica e interface entre el menu y los componentes)
 
-Adicionalmente se utilizaron las librerias de 3er siguientes:
-- AccelStepper
-- LiquidCrystal_I2C
-- PROGMEM_readAnything
-- Servo
-- Arduino
+El manejo por cada libreria de su componente asociado se realiza por un estado procesado en cada ciclo, 
+y funciones que alteran este estado. Al llamar estas funciones, las variables que llevan el registro de 
+cual es el estado actual son modifcadas. Luego, en el proximo ciclo y al procesar el estado del objeto,
+este cambio es detectado y su componente se opera de acuerdo a este.
 
-Por ultimo, la Universidad nos provio de las siguientes librerias para operar el sensor de color:
-- COLOR
-- Adafruit_TCS34725
-- ColorConverterLib.h
+La operacion de todos los componentes, y los programas de accion atados a los items del menu, son manejados
+por el objeto sorterControl. El objeto recive por referencia los objetos de la mayoria de los componentes
+ya inicializados en el main.ino y opera sus metodos de acuerdo a distintos programas para realizar las 
+tareas de clasificacion, configuracion, y etc. 
+
+Estos programas son el centro de la clasificadora. Indican la tarea a realizar programada, y como operar
+los componentes necesarios para llevarla a cabo, como puede ser el repetir los movimientos de stepper>sensor>servo
+indefinidamente para la automatizacion completa.
+
+La funcion loop principal del Arduino no interactua con la mayoria de los componentes, salvo para
+pedirles que procesen sus estados respectivos. Solo interactua con los botones y el menu. Al detectarse
+un cambio de estado de cada boton, el programa llama a al metodo relevante del menu para que este
+procese la accion del usuario y que se debe hacer al respecto.
+
+El menu es el que procesa estas acciones e interactua con los objetos displayControl (pantalla) y sorterControl 
+(clasificadora) para navegar por el menu dentro de la pantalla, o iniciar un programa de la clasificadora. Por limitaciones
+de la memoria dinamica del Arduino UNO, toda la estructura del menu fue guardada en la memoria del programa. De lo
+contrario, el array con los datos ocuparia mas del 100% de la memoria por si solo.
 
 ### Librerias
 
@@ -229,6 +238,18 @@ Presenta un menu por display al usuario y le permite interactuar con la clasific
     * `canGoBack()`: Devuelve verdadero si existe abuelo del item del menu actual.
 </details>
 </blockquote>
+
+Adicionalmente se utilizaron las librerias de 3er siguientes:
+- AccelStepper
+- LiquidCrystal_I2C
+- PROGMEM_readAnything
+- Servo
+- Arduino
+
+Por ultimo, la Universidad nos provio de las siguientes librerias para operar el sensor de color:
+- COLOR
+- Adafruit_TCS34725
+- ColorConverterLib.h
 
 ### Ensamblado
 
