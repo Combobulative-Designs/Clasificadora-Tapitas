@@ -59,41 +59,28 @@ enum class MenuActions {
 };
 
 typedef struct {
-    int white;
     int red;
     int green;
     int blue;
 } RGBColor;
 
-typedef struct {
-    int red;
-    int green;
-    int blue;
-} RGBColorNorm;
-
 class ButtonState {
 public:
     ButtonState();
 
-    void attach(int p_pin_button, int p_debounce_delay);
-    ButtonAction getUserAction();
-    bool debounced();
-
+    void attach(int, int);
     void processState();
+    bool debounced();
+    ButtonAction getUserAction();
+
 
 private:
     int pinButton;
-
-    bool initialized;
     int state;
-    enum ButtonAction userAction;
-    unsigned long lastReading;
     int debounceDelay;
+    bool initialized;
+    unsigned long lastReading;
+    enum ButtonAction userAction;
 };
-
-RGBColorNorm NormalizeRGBColor(RGBColor);
-char* ConvertColorCategoryToChar(ColorCategory);
-void ConvertRGBColorNormToChar(RGBColorNorm, char*);
-void ConvertRGBSampleIndexToName(int, char*);
 
 #endif //CLASIFICADORA_COMMON_STUFF_H

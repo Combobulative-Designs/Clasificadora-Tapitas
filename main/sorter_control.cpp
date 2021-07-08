@@ -8,6 +8,8 @@
 #include "stepper_control.h"
 #include "rgb_control.h"
 #include "display_control.h"
+#include "progmem_data.h"
+#include "PROGMEM_readAnything.h"
 
 
 SorterControl::SorterControl(SensorControl &p_sensorControl,
@@ -31,10 +33,12 @@ SorterControl::SorterControl(SensorControl &p_sensorControl,
                              currentProgramStep(1),
                              programStartTime(0),
                              colorCategoryRead(ColorCategory::Blacks),
-                             colorRGBRead{0,0,0},
-                             samplesForAvg{0},
+                             lastRGBReading{0,0,0},
+                             rgbSamplesForAvg{0},
                              processedTotal(0),
-                             processedByColor{0,0,0,0,0,0,0}
+                             processedByColor{0,0,0,0,0,0,0},
+                             avgIndex(0),
+                             activeSampleArchive(0)
                              {}
 
 void SorterControl::initialize() {
@@ -205,13 +209,18 @@ void SorterControl::PGM_ManualSensor() {
                 break;
             case 4:
                 if (!sensorControl.isBusy()) {
-                    //colorCategoryRead = sensorControl.getColorRead();
-                    displayControl.setLineText(ConvertColorCategoryToChar(colorCategoryRead), 1, TextAlignment::Center);
+                    lastRGBReading = sensorControl.getRGB();
+                    char rgbStr[12];
+                    char sampleName[11];
+                    sensorControl.getRGBStr(rgbStr);
+                    sensorControl.getRGBName(sampleName);
+                    displayControl.setLineText(rgbStr, 0, TextAlignment::Center);
+                    displayControl.setLineText(sampleName, 1, TextAlignment::Center);
                     currentProgramStep++;
                 }
                 break;
             case 5:
-                if (millis() - programStartTime >= 1000) currentProgramStep++;
+                if (millis() - programStartTime >= 2000) currentProgramStep++;
                 break;
             case 6:
                 locked = false;
@@ -282,7 +291,7 @@ void SorterControl::PGM_ByStepNext() {
                         break;
                     case SorterActions::DiscStep:
                         if (!sensorControl.isBusy()) {
-                            //colorCategoryRead = sensorControl.getColorRead();
+                            lastRGBReading = sensorControl.getRGB();
                             currentProgramStep++;
                         }
                         break;
@@ -368,6 +377,7 @@ void SorterControl::PGM_Automatic() {
                         break;
                     case SorterActions::DiscStep:
                         if (!sensorControl.isBusy()) {
+                            lastRGBReading = sensorControl.getRGB();
                             //colorCategoryRead = sensorControl.getColorRead();
                             processedTotal++;
                             processedByColor[(int)colorCategoryRead]++;
@@ -473,10 +483,40 @@ void SorterControl::PGM_Startup() {
                         TextAlignment::Center);
                 currentProgramStep++;
                 break;
+
             case 3:
-                if (millis() - programStartTime >= 3000) currentProgramStep++;
+                if (!sensorControl.isBusy()) {
+                    sensorControl.requestColorReading();
+                    currentProgramStep++;
+                }
                 break;
             case 4:
+                if (!sensorControl.isBusy()) {
+                    lastRGBReading = sensorControl.getRGB();
+
+                    int colorDistMin = 9999;
+                    int colorDist;
+
+                    for (int archInd = 0; archInd < 4; archInd++) {
+                        RGBColor activeSamples[12];
+                        PROGMEM_readAnything (&samplesArchive [archInd], activeSamples);
+
+
+                        colorDist = sensorControl.getDistanceToSample(lastRGBReading, activeSamples[11]);
+                        if (colorDist < colorDistMin) {
+                            activeSampleArchive = archInd;
+                            colorDistMin = colorDist;
+                        }
+
+                    }
+                    sensorControl.setActiveSampleArchive(activeSampleArchive);
+                    currentProgramStep++;
+                }
+                break;
+            case 5:
+                if (millis() - programStartTime >= 3000) currentProgramStep++;
+                break;
+            case 6:
                 displayControl.noNavArrows();
                 displayControl.setLineText(
                         (char*)"TAPINATOR 9KPP\0\0\0\0\0",
@@ -488,10 +528,10 @@ void SorterControl::PGM_Startup() {
                         TextAlignment::Center);
                 currentProgramStep++;
                 break;
-            case 5:
+            case 7:
                 if (millis() - programStartTime >= 6000) currentProgramStep++;
                 break;
-            case 6:
+            case 8:
                 locked = false;
                 currentProgramStep = 99;
                 currentProgram = SorterPrograms::Rest;
@@ -526,27 +566,29 @@ void SorterControl::PGM_SensorAvg() {
                     }
                 } else {
                     for (int i = 0; i < 10; i++) {
-                        colorRGBRead.red += samplesForAvg[i].red;
+                        lastRGBReading.red += rgbSamplesForAvg[i].red;
                     }
                     for (int i = 0; i < 10; i++) {
-                        colorRGBRead.green += samplesForAvg[i].green;
+                        lastRGBReading.green += rgbSamplesForAvg[i].green;
                     }
                     for (int i = 0; i < 10; i++) {
-                        colorRGBRead.blue += samplesForAvg[i].blue;
+                        lastRGBReading.blue += rgbSamplesForAvg[i].blue;
                     }
-                    colorRGBRead.red = colorRGBRead.red / 10;
-                    colorRGBRead.green = colorRGBRead.green / 10;
-                    colorRGBRead.blue =  colorRGBRead.blue / 10;
-                    char colorRGBNormStr[12];
-                    ConvertRGBColorNormToChar(colorRGBRead, colorRGBNormStr);
-                    displayControl.setLineText((char*)"Color:\0\0\0\0\0\0\0\0\0\0\0\0\0", 0, TextAlignment::Center);
-                    displayControl.setLineText(colorRGBNormStr, 1, TextAlignment::Center);
+                    lastRGBReading.red = lastRGBReading.red / 10;
+                    lastRGBReading.green = lastRGBReading.green / 10;
+                    lastRGBReading.blue =  lastRGBReading.blue / 10;
+                    char rgbStr[12];
+                    char sampleName[11];
+                    sensorControl.getRGBStr(rgbStr, lastRGBReading);
+                    sensorControl.getRGBName(sampleName, lastRGBReading);
+                    displayControl.setLineText(rgbStr, 0, TextAlignment::Center);
+                    displayControl.setLineText(sampleName, 1, TextAlignment::Center);
                     currentProgramStep = 5;
                 }
                 break;
             case 4:
                 if (!sensorControl.isBusy()) {
-                    samplesForAvg[avgIndex] = NormalizeRGBColor(sensorControl.getColorReadRGB());
+                    rgbSamplesForAvg[avgIndex] = sensorControl.getRGB();
                     avgIndex++;
                     currentProgramStep = 3;
                 }
@@ -588,16 +630,12 @@ void SorterControl::PGM_SensorData() {
                 break;
             case 4:
                 if (!sensorControl.isBusy()) {
-                    //colorCategoryRead = sensorControl.getColorRead();
-                    colorRGBRead = NormalizeRGBColor(sensorControl.getColorReadRGB());
-                    int sampleNearestIndex = sensorControl.getNearestSampleIndex();
-                    char colorRGBNormStr[12];
-                    ConvertRGBColorNormToChar(colorRGBRead, colorRGBNormStr);
+                    lastRGBReading = sensorControl.getRGB();
+                    char rgbStr[12];
                     char sampleName[11];
-                    ConvertRGBSampleIndexToName(sampleNearestIndex, sampleName);
-                    //displayControl.setLineText((char*)"Color:\0\0\0\0\0\0\0\0\0\0\0\0\0", 0, TextAlignment::Center);
-                    //displayControl.setLineText(colorRGBNormStr, 1, TextAlignment::Center);
-                    displayControl.setLineText(colorRGBNormStr, 0, TextAlignment::Center);
+                    sensorControl.getRGBStr(rgbStr);
+                    sensorControl.getRGBName(sampleName);
+                    displayControl.setLineText(rgbStr, 0, TextAlignment::Center);
                     displayControl.setLineText(sampleName, 1, TextAlignment::Center);
                     currentProgramStep++;
                 }

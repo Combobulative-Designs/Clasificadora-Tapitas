@@ -34,16 +34,17 @@ private:
     bool locked;
     bool stopSignal;
     enum SorterActions lastAction;
+    enum ColorCategory colorCategoryRead;
     enum SorterPrograms currentProgram;
     int currentProgramStep;
-    unsigned long programStartTime;
-    enum ColorCategory colorCategoryRead;
-    RGBColorNorm colorRGBRead;
-    RGBColorNorm samplesForAvg[10];
     int avgIndex;
-    unsigned long autoOperationTime;
     int processedTotal;
     int processedByColor[7];
+    int activeSampleArchive;
+    unsigned long programStartTime;
+    unsigned long autoOperationTime;
+    RGBColor lastRGBReading;
+    RGBColor rgbSamplesForAvg[10];
 
     void PGM_Startup();
     void PGM_Automatic();

@@ -43,7 +43,7 @@ void ButtonState::processState() {
 
 ButtonAction ButtonState::getUserAction() {return userAction;}
 bool ButtonState::debounced() {return (lastReading + debounceDelay <= millis());}
-
+/*
 RGBColorNorm NormalizeRGBColor(RGBColor rgbColor) {
     RGBColorNorm rgbNorm;
 
@@ -52,8 +52,8 @@ RGBColorNorm NormalizeRGBColor(RGBColor rgbColor) {
     rgbNorm.blue = (int)(((float)rgbColor.blue / rgbColor.white) * 255.0);
 
     return rgbNorm;
-}
-
+}*/
+/*
 char* ConvertColorCategoryToChar(ColorCategory p_category) {
     switch (p_category) {
         case ColorCategory::Reds:
@@ -93,4 +93,4 @@ void ConvertRGBSampleIndexToName(int sampleIndex, char* rgbName) {
     char rgbName11[11];
     PROGMEM_readAnything (&sampleNames [sampleIndex], rgbName11);
     rgbName = (char*)rgbName11;
-};
+};*/

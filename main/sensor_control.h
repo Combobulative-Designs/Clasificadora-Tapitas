@@ -12,31 +12,35 @@ public:
 
     void initialize();
     void processState();
-
     void setAuxLEDMode(enum SensorAuxLEDMode);
-    bool isBusy();
-
-    RGBColor getColorReadRGB();
-    int getNearestSampleIndex();
-
     void requestColorReading();
+    void setEmptyReading();
+    void getRGBStr(char*);
+    void getRGBName(char*);
+    void getRGBStr(char*, RGBColor);
+    void getRGBName(char*, RGBColor);
+    int getNearestSampleIndex();
+    void setActiveSampleArchive(int);
+    double getDistanceToSample(RGBColor, RGBColor);
+    bool isBusy();
+    RGBColor getRGB();
+
 
 private:
-    enum SensorAuxLEDMode auxLEDMode;
-    enum ColorCategory colorRead;
     Adafruit_TCS34725 sensor;
-    RGBColor colorReadRGB;
     int auxLEDPin;
+    int activeSamplesArchive;
     bool initialized;
     bool busy;
     bool auxLEDState;
     bool auxLEDStateChanged;
-    unsigned long lastActivity;
     bool queuedReadAction;
+    RGBColor emptyReading;
+    RGBColor lastReading;
+    enum SensorAuxLEDMode auxLEDMode;
+    unsigned long lastActivity;
 
-    double calcColorDistance(RGBColorNorm, RGBColorNorm);
     void readColor();
-    void readColorRGB();
 };
 
 #endif //CLASIFICADORA_TI3_SENSOR_CONTROL_H
