@@ -70,7 +70,7 @@ void SensorControl::processState() {
             else {
                 sensor.setInterrupt(true);
             }
-            //digitalWrite(auxLEDPin, auxLEDState);
+            digitalWrite(auxLEDPin, auxLEDState);
             auxLEDStateChanged = false;
         }
 
@@ -136,21 +136,25 @@ void SensorControl::getRGBName(char* nameStr) {
         int colorDist;
         int closestSampleIndex;
 
-        RGBColor samples[12];
-        PROGMEM_readAnything (&samplesArchive [activeSamplesArchive], samples);
-        for (int i = 0; i < 11; i++) {
-            colorDist = getDistanceToSample(lastReading, samples[i]);
+        for (int i = 0; i < strlen(nameStr); i++) {
+            nameStr[i] = '\0';
+        }
+
+        RGBSampleSet sampleSet;
+        PROGMEM_readAnything (&samplesArchive [activeSamplesArchive], sampleSet);
+        for (int i = 0; i < 12; i++) {
+            colorDist = getDistanceToSample(lastReading, sampleSet.colors[i]);
             if (colorDist < colorDistMin) {
                 closestSampleIndex = i;
                 colorDistMin = colorDist;
             }
         }
-
+        
         char name[11];
         PROGMEM_readAnything (&sampleNames [closestSampleIndex], name);
-        nameStr = (char*)name;
-    } else {
-        return 0;
+        Serial.println(closestSampleIndex);
+        Serial.println(activeSamplesArchive);
+        strcat(nameStr, name);
     }
 }
 
@@ -179,10 +183,14 @@ void SensorControl::getRGBName(char* nameStr, RGBColor rgbColor) {
         int colorDist;
         int closestSampleIndex;
 
-        RGBColor samples[12];
-        PROGMEM_readAnything (&samplesArchive [activeSamplesArchive], samples);
-        for (int i = 0; i < 11; i++) {
-            colorDist = getDistanceToSample(lastReading, samples[i]);
+        for (int i = 0; i < strlen(nameStr); i++) {
+            nameStr[i] = '\0';
+        }
+
+        RGBSampleSet sampleSet;
+        PROGMEM_readAnything (&samplesArchive [activeSamplesArchive], sampleSet);
+        for (int i = 0; i < 12; i++) {
+            colorDist = getDistanceToSample(lastReading, sampleSet.colors[i]);
             if (colorDist < colorDistMin) {
                 closestSampleIndex = i;
                 colorDistMin = colorDist;
@@ -191,9 +199,27 @@ void SensorControl::getRGBName(char* nameStr, RGBColor rgbColor) {
 
         char name[11];
         PROGMEM_readAnything (&sampleNames [closestSampleIndex], name);
-        nameStr = (char*)name;
-    } else {
-        return 0;
+        strcat(nameStr, name);
+    }
+}
+
+enum ColorCategory SensorControl::getColorCategory() {
+    if (initialized) {
+        int colorDistMin = 9999;
+        int colorDist;
+        int closestSampleIndex;
+
+        RGBSampleSet sampleSet;
+        PROGMEM_readAnything(&samplesArchive[activeSamplesArchive], sampleSet);
+        for (int i = 0; i < 12; i++) {
+            colorDist = getDistanceToSample(lastReading, sampleSet.colors[i]);
+            if (colorDist < colorDistMin) {
+                closestSampleIndex = i;
+                colorDistMin = colorDist;
+            }
+        }
+
+        return RGBColorSampleIndexToCategory(closestSampleIndex);
     }
 }
 
@@ -214,7 +240,7 @@ void SensorControl::readColor() {
 }
 
 double SensorControl::getDistanceToSample(RGBColor reading, RGBColor sample) {
-    //return sqrt(pow(lastReading.red - sample.red, 2) + pow(lastReading.green - sample.green, 2) + pow(lastReading.blue - sample.blue, 2));
+    //return sqrt(pow(reading.red - sample.red, 2) + pow(reading.green - sample.green, 2) + pow(reading.blue - sample.blue, 2));
     long rmean = ( (long)reading.red + (long)sample.red ) / 2;
     long r = (long)reading.red - (long)sample.red;
     long g = (long)reading.green - (long)sample.green;

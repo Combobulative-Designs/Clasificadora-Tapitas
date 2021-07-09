@@ -24,6 +24,7 @@ public:
     double getDistanceToSample(RGBColor, RGBColor);
     bool isBusy();
     RGBColor getRGB();
+    enum ColorCategory getColorCategory();
 
 
 private:

@@ -43,6 +43,38 @@ void ButtonState::processState() {
 
 ButtonAction ButtonState::getUserAction() {return userAction;}
 bool ButtonState::debounced() {return (lastReading + debounceDelay <= millis());}
+
+enum ColorCategory RGBColorSampleIndexToCategory(int index) {
+    switch (index) {
+        case 0:
+            return ColorCategory::Blacks;
+        case 1:
+            return ColorCategory::Whites;
+        case 2:
+            return ColorCategory::Reds;
+        case 3:
+            return ColorCategory::Yellows;
+        case 4:
+            return ColorCategory::Reds;
+        case 5:
+            return ColorCategory::Reds;
+        case 6:
+            return ColorCategory::Reds;
+        case 7:
+            return ColorCategory::Blues;
+        case 8:
+            return ColorCategory::Greens;
+        case 9:
+            return ColorCategory::Greens;
+        case 10:
+            return ColorCategory::Reds;
+        case 11:
+            return ColorCategory::Blues;
+        default:
+            return ColorCategory::Greys;
+    }
+}
+
 /*
 RGBColorNorm NormalizeRGBColor(RGBColor rgbColor) {
     RGBColorNorm rgbNorm;

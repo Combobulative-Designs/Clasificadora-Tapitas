@@ -103,10 +103,11 @@ void SorterControl::processState() {
                 PGM_Automatic();
                 break;
             case SorterPrograms::CycleStepper:
+                //PGM_SensorData();
                 PGM_CycleStepper();
                 break;
             case SorterPrograms::CalibrateSensor:
-                PGM_SensorData();
+                PGM_SensorAvg();
                 break;
             case SorterPrograms::Startup:
                 PGM_Startup();
@@ -210,6 +211,7 @@ void SorterControl::PGM_ManualSensor() {
             case 4:
                 if (!sensorControl.isBusy()) {
                     lastRGBReading = sensorControl.getRGB();
+                    colorCategoryRead = sensorControl.getColorCategory();
                     char rgbStr[12];
                     char sampleName[11];
                     sensorControl.getRGBStr(rgbStr);
@@ -292,6 +294,7 @@ void SorterControl::PGM_ByStepNext() {
                     case SorterActions::DiscStep:
                         if (!sensorControl.isBusy()) {
                             lastRGBReading = sensorControl.getRGB();
+                            colorCategoryRead = sensorControl.getColorCategory();
                             currentProgramStep++;
                         }
                         break;
@@ -378,7 +381,7 @@ void SorterControl::PGM_Automatic() {
                     case SorterActions::DiscStep:
                         if (!sensorControl.isBusy()) {
                             lastRGBReading = sensorControl.getRGB();
-                            //colorCategoryRead = sensorControl.getColorRead();
+                            colorCategoryRead = sensorControl.getColorCategory();
                             processedTotal++;
                             processedByColor[(int)colorCategoryRead]++;
                             currentProgramStep++;
@@ -498,11 +501,14 @@ void SorterControl::PGM_Startup() {
                     int colorDist;
 
                     for (int archInd = 0; archInd < 4; archInd++) {
-                        RGBColor activeSamples[12];
-                        PROGMEM_readAnything (&samplesArchive [archInd], activeSamples);
+                        RGBSampleSet activeSampleSet;
+                        PROGMEM_readAnything (&samplesArchive [archInd], activeSampleSet);
 
-
-                        colorDist = sensorControl.getDistanceToSample(lastRGBReading, activeSamples[11]);
+                        
+                        char sampleName321[12];
+                        sensorControl.getRGBStr(sampleName321, activeSampleSet.base);
+                        colorDist = sensorControl.getDistanceToSample(lastRGBReading, activeSampleSet.base);
+                        Serial.print(sampleName321);
                         if (colorDist < colorDistMin) {
                             activeSampleArchive = archInd;
                             colorDistMin = colorDist;
@@ -578,11 +584,9 @@ void SorterControl::PGM_SensorAvg() {
                     lastRGBReading.green = lastRGBReading.green / 10;
                     lastRGBReading.blue =  lastRGBReading.blue / 10;
                     char rgbStr[12];
-                    char sampleName[11];
                     sensorControl.getRGBStr(rgbStr, lastRGBReading);
-                    sensorControl.getRGBName(sampleName, lastRGBReading);
-                    displayControl.setLineText(rgbStr, 0, TextAlignment::Center);
-                    displayControl.setLineText(sampleName, 1, TextAlignment::Center);
+                    displayControl.setLineText("Color", 0, TextAlignment::Center);
+                    displayControl.setLineText(rgbStr, 1, TextAlignment::Center);
                     currentProgramStep = 5;
                 }
                 break;
@@ -631,12 +635,11 @@ void SorterControl::PGM_SensorData() {
             case 4:
                 if (!sensorControl.isBusy()) {
                     lastRGBReading = sensorControl.getRGB();
-                    char rgbStr[12];
-                    char sampleName[11];
-                    sensorControl.getRGBStr(rgbStr);
-                    sensorControl.getRGBName(sampleName);
-                    displayControl.setLineText(rgbStr, 0, TextAlignment::Center);
-                    displayControl.setLineText(sampleName, 1, TextAlignment::Center);
+                    colorCategoryRead = sensorControl.getColorCategory();
+                    char sampleName321[11];
+                    sensorControl.getRGBName(sampleName321);
+                    displayControl.setLineText("Color", 0, TextAlignment::Center);
+                    displayControl.setLineText(sampleName321, 1, TextAlignment::Center);
                     currentProgramStep++;
                 }
                 break;

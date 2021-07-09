@@ -64,6 +64,11 @@ typedef struct {
     int blue;
 } RGBColor;
 
+typedef struct {
+    RGBColor colors[12];
+    RGBColor base;
+} RGBSampleSet;
+
 class ButtonState {
 public:
     ButtonState();
@@ -82,5 +87,7 @@ private:
     unsigned long lastReading;
     enum ButtonAction userAction;
 };
+
+enum ColorCategory RGBColorSampleIndexToCategory(int);
 
 #endif //CLASIFICADORA_COMMON_STUFF_H
